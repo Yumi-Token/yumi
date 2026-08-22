@@ -41,6 +41,9 @@ contract DeploymentTest is Test {
     uint64 internal constant INVENTORY_DURATION = 2920 days;
     uint256 internal constant MIN_DELAY = 7 days;
 
+    /// @dev 초기 LP 투입량 — docs/TOKENOMICS.md 「초기 구간」, D-016
+    uint256 internal constant INITIAL_LIQUIDITY = 4_000_000 ether;
+
     /// @dev script/Deploy.s.sol 과 같은 순서로 배포합니다.
     function setUp() public {
         vm.warp(1_800_000_000);
@@ -120,14 +123,18 @@ contract DeploymentTest is Test {
      * @notice 「예고 없이 움직일 수 있는 양」의 검증.
      *
      * 배포 직후에는 근거리 재고 5,000,000 뿐이고,
-     * 초기 LP에 2,000,000을 넣으면 3,000,000(총량의 3%)이 됩니다.
+     * 초기 LP에 4,000,000을 넣으면 1,000,000(총량의 1%)이 남습니다. (D-016)
      */
     function test_UnannouncedMovableIsNearTermOnly() public view {
-        assertEq(token.balanceOf(deployer), 5_000_000 ether);
-        assertEq(token.balanceOf(deployer) - 2_000_000 ether, 3_000_000 ether);
+        assertEq(token.balanceOf(deployer), 5_000_000 ether, unicode"배포 직후 근거리 재고");
+        assertEq(
+            token.balanceOf(deployer) - INITIAL_LIQUIDITY,
+            1_000_000 ether,
+            unicode"초기 LP 투입 후 남는 양 = 총량의 1%"
+        );
     }
 
-    /// @notice 이 셋이 타임락이어야 「3%」가 시간에 대해 참이 됩니다.
+    /// @notice 이 둘이 타임락이어야 「1%」가 시간에 대해 참이 됩니다.
     function test_BothVestingBeneficiariesAreTimelock() public view {
         assertEq(founderVesting.owner(), address(timelock), unicode"창업자 베스팅 수령 주소");
         assertEq(inventoryVesting.owner(), address(timelock), unicode"장기 재고 수령 주소");

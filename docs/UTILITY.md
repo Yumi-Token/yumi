@@ -153,7 +153,7 @@
 
 ## 관련 문서
 
-- [`DECISIONS.md`](DECISIONS.md) D-016 — 이 결정의 기록
+- [`DECISIONS.md`](DECISIONS.md) D-017 — 이 결정의 기록
 - [`DECISIONS.md`](DECISIONS.md) D-001 — 커스텀 코드를 만들지 않는다
 - [`DECISIONS.md`](DECISIONS.md) D-009 — 종료 조건 8주
 - [`DECISIONS.md`](DECISIONS.md) D-014 — 강제되지 않는 것을 강제된다고 쓰지 않는다
