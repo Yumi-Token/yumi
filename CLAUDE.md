@@ -45,7 +45,7 @@
 | | 항목 | 무엇을 보는가 |
 |---|---|---|
 | 1 | **범위** | 요청받은 것만 했는가. 커스텀 코드 0줄이 유지되는가. 컨트랙트에 기능이 늘지 않았는가 (D-001) |
-| 2 | **정합** | **(작업 전)** `git status`가 깨끗한가. **(작업 후)** `docs/TOKENOMICS.md` ↔ `script/Deploy.s.sol` 상수 ↔ `README.md` ↔ `docs/WALLETS.md` ↔ 테스트가 한 방향인가 |
+| 2 | **정합** | **(작업 전)** `git status`가 깨끗한가. **(작업 후)** `docs/TOKENOMICS.md` ↔ `script/Deploy.s.sol` ↔ `test/` ↔ `README.md` 4자가 한 방향인가. 숫자를 바꿨으면 `test/`를 `grep` 했는가 |
 | 3 | **불가역** | 배포 후 못 바꾸는 값을 건드렸는가 — 이름·심볼·decimals·총 발행량·베스팅 일정·장기 재고 `start`·타임락 지연 |
 | 4 | **안전선** | 키와 `.env`를 건드리지 않았는가. 사용자 대신 `--broadcast` 하지 않았는가. 수익·상장·날짜 약속 문구가 들어가지 않았는가 |
 | 5 | **검증** | 실제로 돌린 명령과 그 출력. `forge build` / `forge test` / `forge fmt --check` |
@@ -180,11 +180,23 @@ AI가 미끄러지는 것을 잡는 것**입니다.
 
 ### 공지와 코드가 다르면 안 됩니다
 
-**`README.md` ↔ `docs/TOKENOMICS.md` ↔ `script/Deploy.s.sol` 3자를 대조하세요.**
+**`docs/TOKENOMICS.md` ↔ `script/Deploy.s.sol` ↔ `test/` ↔ `README.md` 4자를 대조하세요.**
 어느 둘이라도 어긋나면 **작업을 멈추고 사용자에게 알리세요.** 사소한 불일치가 아닙니다.
 
-전에 TOKENOMICS와 Deploy만 비교하는 규칙이었는데, 그 틈으로 README가 구버전으로 방치됐습니다.
+이 규칙은 두 번 넓어졌습니다. 넓힐 때마다 그 틈으로 사고가 났기 때문입니다.
+
+| 언제 | 무엇이 방치됐나 |
+|---|---|
+| TOKENOMICS ↔ Deploy 만 비교하던 때 | `README.md`의 배분표가 구버전(60/15/20/5)으로 여러 회차 방치 |
+| 위 셋을 비교하던 때 | 초기 LP가 2M→4M 으로 바뀌었는데 `test/`가 2M을 단언한 채 **60개 전부 통과** |
+
+**테스트는 통과한다고 맞는 것이 아닙니다.** 옛 숫자를 하드코딩한 테스트는
+틀린 상태를 고정할 뿐이고, 통과하기 때문에 오히려 안 보입니다.
+숫자를 바꿨으면 `test/`에서 그 숫자를 `grep` 하세요.
+
 숫자의 단일 출처는 `TOKENOMICS.md`이고, 다른 문서는 링크만 겁니다.
+`test/Deployment.t.sol`의 `test_DeployScriptUsesTheSameNumbers`가
+Deploy 상수와 테스트 숫자를 묶어두지만, **문서까지 묶어주지는 않습니다.**
 
 ### 강제되는 것과 약속을 섞어 쓰지 마세요
 
