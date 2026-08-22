@@ -26,7 +26,7 @@ contract DeploymentTest is Test {
     TimelockController internal timelock;
 
     address internal deployer = makeAddr("deployer");
-    address internal operator = makeAddr("operator");
+    address internal safe = makeAddr("safe");
 
     uint64 internal deployedAt;
 
@@ -52,7 +52,7 @@ contract DeploymentTest is Test {
         vm.startPrank(deployer);
 
         address[] memory proposers = new address[](1);
-        proposers[0] = operator;
+        proposers[0] = safe;
         address[] memory executors = new address[](1);
         executors[0] = address(0);
 
@@ -143,7 +143,7 @@ contract DeploymentTest is Test {
     /**
      * @notice 10년이 지나 전부 해제돼도 발행자 지갑으로 직행하는 물량이 없습니다.
      *
-     * 이 테스트가 깨지면 「10년 뒤 88%」 설계로 되돌아간 것입니다.
+     * 이 테스트가 깨지면 「10년 뒤 86%」 설계로 되돌아간 것입니다.
      */
     function test_NothingReachesDeployerDirectlyAfterTenYears() public {
         uint256 before = token.balanceOf(deployer);
@@ -169,7 +169,7 @@ contract DeploymentTest is Test {
         bytes32 adminRole = timelock.DEFAULT_ADMIN_ROLE();
 
         assertFalse(timelock.hasRole(adminRole, deployer), unicode"배포자가 admin이면 안 됩니다");
-        assertFalse(timelock.hasRole(adminRole, operator), unicode"운영자가 admin이면 안 됩니다");
+        assertFalse(timelock.hasRole(adminRole, safe), unicode"Safe가 admin이면 안 됩니다");
         assertTrue(
             timelock.hasRole(adminRole, address(timelock)), unicode"자기 자신은 admin입니다 (표준)"
         );
@@ -178,7 +178,7 @@ contract DeploymentTest is Test {
     function test_OnlyOperatorCanPropose() public view {
         bytes32 proposerRole = timelock.PROPOSER_ROLE();
 
-        assertTrue(timelock.hasRole(proposerRole, operator));
+        assertTrue(timelock.hasRole(proposerRole, safe));
         assertFalse(
             timelock.hasRole(proposerRole, address(0)), unicode"예약까지 열려 있으면 안 됩니다"
         );
@@ -192,19 +192,44 @@ contract DeploymentTest is Test {
         );
     }
 
+    /**
+     * @notice proposer가 배포 지갑이면 안 됩니다.
+     *
+     * 이게 깨지면 D-007의 영구 동결 구조입니다 — 키 하나가 예약과 취소를
+     * 동시에 쥐면 공격자도 나도 물량을 못 옮깁니다.
+     */
+    function test_ProposerIsNotTheDeployer() public view {
+        assertFalse(
+            timelock.hasRole(timelock.PROPOSER_ROLE(), deployer),
+            unicode"배포 지갑이 proposer면 안 됩니다 (D-019)"
+        );
+    }
+
+    /**
+     * @notice 배포 지갑은 취소 권한도 없어야 합니다.
+     *
+     * CANCELLER는 PROPOSER와 함께 부여되므로 위 테스트와 짝입니다.
+     */
+    function test_DeployerHasNoCancellerRole() public view {
+        assertFalse(
+            timelock.hasRole(timelock.CANCELLER_ROLE(), deployer),
+            unicode"배포 지갑이 취소 권한을 가지면 안 됩니다 (D-007)"
+        );
+    }
+
     // ─── 타임락은 실제로 지연을 강제하는가 ───────────────────
 
     function test_CannotExecuteWithoutScheduling() public {
-        bytes memory data = abi.encodeCall(token.transfer, (operator, 1 ether));
+        bytes memory data = abi.encodeCall(token.transfer, (safe, 1 ether));
 
         vm.expectRevert();
         timelock.execute(address(token), 0, data, bytes32(0), bytes32("s1"));
     }
 
     function test_CannotExecuteBeforeDelayPasses() public {
-        bytes memory data = abi.encodeCall(token.transfer, (operator, 1 ether));
+        bytes memory data = abi.encodeCall(token.transfer, (safe, 1 ether));
 
-        vm.prank(operator);
+        vm.prank(safe);
         timelock.schedule(address(token), 0, data, bytes32(0), bytes32("s1"), MIN_DELAY);
 
         vm.warp(block.timestamp + MIN_DELAY - 1);
@@ -213,15 +238,15 @@ contract DeploymentTest is Test {
     }
 
     function test_ExecutesAfterDelay() public {
-        bytes memory data = abi.encodeCall(token.transfer, (operator, 1 ether));
+        bytes memory data = abi.encodeCall(token.transfer, (safe, 1 ether));
 
-        vm.prank(operator);
+        vm.prank(safe);
         timelock.schedule(address(token), 0, data, bytes32(0), bytes32("s1"), MIN_DELAY);
 
         vm.warp(block.timestamp + MIN_DELAY);
         timelock.execute(address(token), 0, data, bytes32(0), bytes32("s1"));
 
-        assertEq(token.balanceOf(operator), 1 ether);
+        assertEq(token.balanceOf(safe), 1 ether);
     }
 
     /**
@@ -231,9 +256,9 @@ contract DeploymentTest is Test {
      * 문서(TOKENOMICS.md)에 적어두고 여기서 고정합니다.
      */
     function test_SameOperationCannotBeScheduledTwice() public {
-        bytes memory data = abi.encodeCall(token.transfer, (operator, 1 ether));
+        bytes memory data = abi.encodeCall(token.transfer, (safe, 1 ether));
 
-        vm.startPrank(operator);
+        vm.startPrank(safe);
         timelock.schedule(address(token), 0, data, bytes32(0), bytes32("same"), MIN_DELAY);
 
         vm.expectRevert();
@@ -252,9 +277,9 @@ contract DeploymentTest is Test {
 
     /// @notice 7일보다 짧은 지연으로는 예약 자체가 되지 않습니다.
     function test_CannotScheduleWithShorterDelay() public {
-        bytes memory data = abi.encodeCall(token.transfer, (operator, 1 ether));
+        bytes memory data = abi.encodeCall(token.transfer, (safe, 1 ether));
 
-        vm.prank(operator);
+        vm.prank(safe);
         vm.expectRevert();
         timelock.schedule(address(token), 0, data, bytes32(0), bytes32("s1"), MIN_DELAY - 1);
     }
@@ -267,12 +292,12 @@ contract DeploymentTest is Test {
      * D-007의 「7일은 주간 기록 주기와 맞다」는 근거가 성립하지 않습니다.
      */
     function test_ScheduledOperationIsPubliclyVisible() public {
-        bytes memory data = abi.encodeCall(token.transfer, (operator, 1 ether));
+        bytes memory data = abi.encodeCall(token.transfer, (safe, 1 ether));
         bytes32 id = timelock.hashOperation(address(token), 0, data, bytes32(0), bytes32("s1"));
 
         assertFalse(timelock.isOperation(id), unicode"예약 전에는 조회되지 않습니다");
 
-        vm.prank(operator);
+        vm.prank(safe);
         timelock.schedule(address(token), 0, data, bytes32(0), bytes32("s1"), MIN_DELAY);
 
         assertTrue(
@@ -289,11 +314,11 @@ contract DeploymentTest is Test {
     /**
      * @notice 지연 시간 변경조차 타임락을 거쳐야 합니다.
      *
-     * 운영자가 updateDelay(0)을 직접 부를 수 있다면 7일은 언제든
+     * Safe가 updateDelay(0)을 직접 부를 수 있다면 7일은 언제든
      * 사라질 수 있는 숫자가 되고, 「예고 없이 움직일 수 있는 양」 주장이 무너집니다.
      */
     function test_MinDelayCannotBeChangedDirectly() public {
-        vm.prank(operator);
+        vm.prank(safe);
         vm.expectRevert();
         timelock.updateDelay(0);
 

@@ -15,9 +15,10 @@ import {FounderVesting} from "../src/FounderVesting.sol";
  *   테스트넷  forge script script/Deploy.s.sol --rpc-url base_sepolia --broadcast --verify
  *   메인넷    forge script script/Deploy.s.sol --rpc-url base       --broadcast --verify
  *
- * ─── 배포 순서가 중요합니다 (D-015) ───────────────────────────
+ * ─── 배포 순서가 중요합니다 (D-015, D-019) ─────────────────────
  *
- *   1. TimelockController   ← 반드시 먼저. 두 베스팅이 이 주소를 받습니다
+ *   0. Safe 2-of-3 생성      ← 스크립트 밖. app.safe.global (D-019)
+ *   1. TimelockController   ← proposers = [Safe 주소]
  *   2. Token                  전량이 deployer(=treasury)에게 발행
  *   3. FounderVesting         beneficiary = 타임락
  *   4. VestingWallet (재고)   beneficiary = 타임락, 2년 뒤 시작
@@ -88,32 +89,36 @@ contract Deploy is Script {
         uint256 deployerKey = vm.envUint("PRIVATE_KEY");
         address deployer = vm.addr(deployerKey);
 
-        // 타임락에 예약을 걸 수 있는 주소. 미설정 시 배포 지갑을 씁니다.
-        address operator = vm.envOr("OPERATOR_ADDRESS", deployer);
+        // 타임락에 예약을 걸 수 있는 주소 = Safe 2-of-3 (D-019)
+        // envAddress는 미설정 시 revert합니다. 폴백을 두지 않는 것이 요점입니다 —
+        // 배포 지갑이 조용히 proposer가 되면 D-007의 영구 동결 구조가 됩니다.
+        address safe = vm.envAddress("SAFE_ADDRESS");
+
+        require(safe != deployer, "SAFE_ADDRESS == deployer");
+        require(safe.code.length > 0, "SAFE_ADDRESS is not a contract");
 
         _assertAllocationsSumToSupply();
 
         console2.log("=== Deploy ===");
         console2.log("chain id      :", block.chainid);
         console2.log("deployer      :", deployer);
-        console2.log("operator      :", operator);
-        if (operator == deployer) {
-            console2.log(unicode"   ! OPERATOR_ADDRESS 미설정 - 배포 지갑을 그대로 씁니다");
-        }
+        console2.log("safe (proposer):", safe);
 
         vm.startBroadcast(deployerKey);
 
         // ── 1. 타임락 (가장 먼저) ────────────────────────────
         //
-        // proposers  : operator 하나. PROPOSER와 CANCELLER 역할이 함께 부여됩니다
+        // proposers  : Safe 2-of-3 주소 하나. PROPOSER와 CANCELLER 역할이 함께 부여됩니다
+        //              EOA를 넣으면 그 키 하나가 예약과 취소를 독점하고,
+        //              유출 시 도난이 아니라 영구 동결이 됩니다 (D-007 / D-019)
         // executors  : address(0) = 누구나 실행 가능
-        //              operator만 넣으면 키 분실 시 물량이 영구히 잠깁니다.
+        //              Safe만 넣으면 키 분실 시 물량이 영구히 잠깁니다.
         //              예약은 여전히 proposer만 할 수 있으므로 위험하지 않습니다
         // admin      : address(0) = 외부 admin 없음
         //              나중에 renounce할 필요가 없도록 처음부터 안 만듭니다
 
         address[] memory proposers = new address[](1);
-        proposers[0] = operator;
+        proposers[0] = safe;
 
         address[] memory executors = new address[](1);
         executors[0] = address(0);

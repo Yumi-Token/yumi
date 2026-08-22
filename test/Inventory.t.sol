@@ -38,7 +38,7 @@ contract InventoryTest is Test {
 
     // ─── 수령 주소가 타임락인가 ─────────────────────────────
 
-    /// @notice 여기가 깨지면 해제분이 지갑으로 직행하고 10년 뒤 88%가 됩니다.
+    /// @notice 여기가 깨지면 해제분이 지갑으로 직행하고 10년 뒤 86%가 됩니다.
     function test_BeneficiaryIsTimelock() public view {
         assertEq(vesting.owner(), timelock, unicode"수령 주소는 타임락이어야 합니다");
     }
