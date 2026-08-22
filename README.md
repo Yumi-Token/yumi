@@ -188,6 +188,7 @@ Basescan에서 **소스 검증이 완료됐는지 반드시 확인**하세요.
 
 - [`docs/TOKENOMICS.md`](docs/TOKENOMICS.md) — 배분과 근거
 - [`docs/WALLETS.md`](docs/WALLETS.md) — 공개 지갑 주소
+- [`docs/UTILITY.md`](docs/UTILITY.md) — 왜 지금은 아무 기능도 안 붙이는가
 - [`docs/DECISIONS.md`](docs/DECISIONS.md) — 결정 기록
 - [`log/`](log/) — 주간 기록
 
