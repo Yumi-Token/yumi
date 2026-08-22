@@ -12,7 +12,7 @@
 | | |
 |---|---|
 | 컴파일 | ✅ solc 0.8.28 (forge 1.5.1) |
-| 테스트 | ✅ **62개 통과** (Token 15 / FounderVesting 13 / Inventory 13 / Deployment 21) |
+| 테스트 | ✅ **63개 통과** (Token 15 / FounderVesting 13 / Inventory 13 / Deployment 22) |
 | 배포 스크립트 | ✅ 로컬 시뮬레이션 end-to-end 확인 |
 | 실측 스크립트 가스 | 3,182,788 |
 | 커스텀 코드 | **0줄** — 전부 OpenZeppelin 상속 또는 직접 사용 |
@@ -29,8 +29,8 @@ OpenZeppelin 구체 클래스를 배포 스크립트에서 그대로 `new` 합�
 
 | 버킷 | 수량 | 무엇으로 | 잠금 |
 |---|---|---|---|
-| 창업자 | 20,000,000 | `FounderVesting` | 6개월 클리프 + 24개월 선형 |
-| 장기 재고 | 65,000,000 | `VestingWallet` | `start` = 배포 +730일 / `duration` = 2920일 |
+| 창업자 | 20,000,000 | `FounderVesting` | 3개월 클리프 + 12개월 선형 |
+| 장기 재고 | 65,000,000 | `VestingWallet` | `start` = 배포 +365일 / `duration` = 1095일 |
 | 운영·예비 | 10,000,000 | `TimelockController` | `minDelay` = 7일 |
 | 근거리 재고 | 5,000,000 | 트레저리 잔류 | 없음 |
 
@@ -43,7 +43,7 @@ OpenZeppelin 구체 클래스를 배포 스크립트에서 그대로 `new` 합�
                            admin     = address(0)
 2. Token                   전량이 배포 지갑으로
 3. FounderVesting          beneficiary = 타임락
-4. VestingWallet (재고)     beneficiary = 타임락, start = +730일
+4. VestingWallet (재고)     beneficiary = 타임락, start = +365일
 5. 물량 이체 (20M / 65M / 10M)
    ─ 1~5는 한 broadcast ─
 6. LP 5구간 생성 (4M)       배포 지갑에서

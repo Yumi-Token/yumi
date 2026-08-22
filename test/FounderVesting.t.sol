@@ -20,8 +20,8 @@ contract FounderVestingTest is Test {
     address internal stranger = makeAddr("stranger");
 
     uint64 internal start;
-    uint64 internal constant CLIFF = 180 days; // 6개월
-    uint64 internal constant DURATION = 730 days; // 24개월
+    uint64 internal constant CLIFF = 90 days; // 3개월
+    uint64 internal constant DURATION = 365 days; // 12개월
 
     uint256 internal constant FOUNDER_ALLOCATION = 20_000_000 ether; // 총량의 20%
 
@@ -41,8 +41,8 @@ contract FounderVestingTest is Test {
     function test_ParametersMatchPublishedSchedule() public view {
         assertEq(vesting.owner(), founder, unicode"수령인이 창업자여야 합니다");
         assertEq(vesting.start(), start);
-        assertEq(vesting.duration(), DURATION, unicode"베스팅 기간 24개월");
-        assertEq(vesting.cliff(), start + CLIFF, unicode"클리프 6개월");
+        assertEq(vesting.duration(), DURATION, unicode"베스팅 기간 12개월");
+        assertEq(vesting.cliff(), start + CLIFF, unicode"클리프 3개월");
     }
 
     function test_FullAllocationIsLocked() public view {

@@ -35,10 +35,10 @@ contract DeploymentTest is Test {
     uint256 internal constant OPERATIONS = 10_000_000 ether;
     uint256 internal constant NEAR_TERM = 5_000_000 ether;
 
-    uint64 internal constant CLIFF = 180 days;
-    uint64 internal constant FOUNDER_DURATION = 730 days;
-    uint64 internal constant INVENTORY_START_DELAY = 730 days;
-    uint64 internal constant INVENTORY_DURATION = 2920 days;
+    uint64 internal constant CLIFF = 90 days;
+    uint64 internal constant FOUNDER_DURATION = 365 days;
+    uint64 internal constant INVENTORY_START_DELAY = 365 days;
+    uint64 internal constant INVENTORY_DURATION = 1095 days;
     uint256 internal constant MIN_DELAY = 7 days;
 
     /// @dev 초기 LP 투입량 — docs/TOKENOMICS.md 「초기 구간」, D-016
@@ -88,10 +88,10 @@ contract DeploymentTest is Test {
         assertEq(script.OPERATIONS_ALLOCATION(), OPERATIONS, unicode"운영 예비 10,000,000");
         assertEq(script.NEAR_TERM_ALLOCATION(), NEAR_TERM, unicode"근거리 재고 5,000,000");
 
-        assertEq(script.CLIFF_SECONDS(), CLIFF, unicode"창업자 클리프 180일");
-        assertEq(script.VESTING_DURATION(), FOUNDER_DURATION, unicode"창업자 베스팅 730일");
-        assertEq(script.INVENTORY_START_DELAY(), INVENTORY_START_DELAY, unicode"재고 시작 +730일");
-        assertEq(script.INVENTORY_DURATION(), INVENTORY_DURATION, unicode"재고 해제 2920일");
+        assertEq(script.CLIFF_SECONDS(), CLIFF, unicode"창업자 클리프 90일");
+        assertEq(script.VESTING_DURATION(), FOUNDER_DURATION, unicode"창업자 베스팅 365일");
+        assertEq(script.INVENTORY_START_DELAY(), INVENTORY_START_DELAY, unicode"재고 시작 +365일");
+        assertEq(script.INVENTORY_DURATION(), INVENTORY_DURATION, unicode"재고 해제 1095일");
         assertEq(script.TIMELOCK_MIN_DELAY(), MIN_DELAY, unicode"타임락 7일");
     }
 
@@ -131,6 +131,20 @@ contract DeploymentTest is Test {
             token.balanceOf(deployer) - INITIAL_LIQUIDITY,
             1_000_000 ether,
             unicode"초기 LP 투입 후 남는 양 = 총량의 1%"
+        );
+    }
+
+    /**
+     * @notice 재고 시작 시점이 창업자 베스팅 종료와 맞물려야 합니다.
+     *
+     * 두 일정을 따로 고치다가 사이에 빈 구간이나 겹침이 생기는 것을 막습니다.
+     * 겹치면 그 구간에 해제 속도가 두 배가 됩니다.
+     */
+    function test_InventoryStartsWhenFounderVestingEnds() public view {
+        assertEq(
+            inventoryVesting.start(),
+            founderVesting.start() + founderVesting.duration(),
+            unicode"재고 시작 = 창업자 종료 (D-020)"
         );
     }
 

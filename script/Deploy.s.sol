@@ -21,7 +21,7 @@ import {FounderVesting} from "../src/FounderVesting.sol";
  *   1. TimelockController   ← proposers = [Safe 주소]
  *   2. Token                  전량이 deployer(=treasury)에게 발행
  *   3. FounderVesting         beneficiary = 타임락
- *   4. VestingWallet (재고)   beneficiary = 타임락, 2년 뒤 시작
+ *   4. VestingWallet (재고)   beneficiary = 타임락, 1년 뒤 시작
  *   5. 물량 이체 3건
  *
  * 베스팅의 수령 주소를 발행자 지갑이 아니라 타임락으로 두는 이유:
@@ -57,20 +57,22 @@ contract Deploy is Script {
     uint256 public constant OPERATIONS_ALLOCATION = 10_000_000 ether; // 10%
     uint256 public constant NEAR_TERM_ALLOCATION = 5_000_000 ether; // 5% — treasury에 잔류
 
-    // ─── 창업자 베스팅: 6개월 클리프 + 24개월 선형 ──────────
+    // ─── 창업자 베스팅: 3개월 클리프 + 12개월 선형 (D-020) ───
 
-    uint64 public constant CLIFF_SECONDS = 180 days;
-    uint64 public constant VESTING_DURATION = 730 days;
+    uint64 public constant CLIFF_SECONDS = 90 days;
+    uint64 public constant VESTING_DURATION = 365 days;
 
-    // ─── 장기 재고: 2년 뒤 시작, 이후 8년 선형 ───────────────
+    // ─── 장기 재고: 1년 뒤 시작, 이후 3년 선형 (D-020) ───────
     //
     // 클리프를 쓰지 않는 이유 (D-008):
     //   OpenZeppelin은 선형 계산의 기준점이 클리프가 아니라 start입니다.
-    //   "2년 클리프 + 10년 선형"으로 걸면 2년째에 13,000,000개(총량 13%)가
-    //   한 번에 열립니다. start를 미래로 미루면 그런 지점이 없습니다.
+    //   "1년 클리프 + 3년 선형"으로 걸면 1년째에 21,666,666개(총량 21.7%)가
+    //   한 번에 열립니다. 기간을 줄일수록 이 계단이 커지므로, 단축한 지금
+    //   이 결정은 원안 때보다 더 중요해졌습니다.
+    //   start를 미래로 미루면 그런 지점이 없습니다.
 
-    uint64 public constant INVENTORY_START_DELAY = 730 days;
-    uint64 public constant INVENTORY_DURATION = 2920 days;
+    uint64 public constant INVENTORY_START_DELAY = 365 days;
+    uint64 public constant INVENTORY_DURATION = 1095 days;
 
     // ─── 타임락 ─────────────────────────────────────────────
 
@@ -132,7 +134,7 @@ contract Deploy is Script {
         founderVesting =
             new FounderVesting(address(timelock), uint64(block.timestamp), VESTING_DURATION, CLIFF_SECONDS);
 
-        // ── 4. 장기 재고 베스팅 — 2년 뒤 시작, 수령 주소는 타임락
+        // ── 4. 장기 재고 베스팅 — 1년 뒤 시작, 수령 주소는 타임락
         inventoryVesting = new VestingWallet(
             address(timelock), uint64(block.timestamp) + INVENTORY_START_DELAY, INVENTORY_DURATION
         );

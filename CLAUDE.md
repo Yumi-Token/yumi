@@ -235,7 +235,7 @@ Deploy 상수와 테스트 숫자를 묶어두지만, **문서까지 묶어주�
 
 ```bash
 forge build          # 컴파일
-forge test           # 테스트 (62개 통과해야 정상)
+forge test           # 테스트 (63개 통과해야 정상)
 forge test -vvv      # 실패 시 상세 출력
 forge fmt            # 포맷
 forge test --gas-report

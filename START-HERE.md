@@ -7,7 +7,7 @@
 
 ## 0. 지금 이 폴더에 들어 있는 것
 
-컨트랙트 2개, 테스트 **62개**, 배포 스크립트 1개, 문서 7개, 0주차 선언문 초안.
+컨트랙트 2개, 테스트 **63개**, 배포 스크립트 1개, 문서 7개, 0주차 선언문 초안.
 **컴파일과 테스트는 이미 통과한 상태**입니다. 배포 스크립트도 로컬에서 끝까지 돌려봤습니다.
 
 트레저리 4분할(창업자 베스팅 / 장기 재고 / 운영 타임락 / 근거리 재고)이
@@ -122,10 +122,10 @@ forge test
 Suite result: ok. 15 passed; 0 failed  (Token)
 Suite result: ok. 13 passed; 0 failed  (FounderVesting)
 Suite result: ok. 13 passed; 0 failed  (Inventory)
-Suite result: ok. 21 passed; 0 failed  (Deployment)
+Suite result: ok. 22 passed; 0 failed  (Deployment)
 ```
 
-**62개가 전부 통과해야 정상입니다.** 하나라도 실패하면 그 상태로 멈추고 알려주세요.
+**63개가 전부 통과해야 정상입니다.** 하나라도 실패하면 그 상태로 멈추고 알려주세요.
 
 ---
 
@@ -236,11 +236,11 @@ cast call <토큰주소> "balanceOf(address)(uint256)" <배포지갑>     --rpc-
 cast call <창업자베스팅> "owner()(address)" --rpc-url base_sepolia
 cast call <장기재고>     "owner()(address)" --rpc-url base_sepolia
 
-# 지금 꺼낼 수 있는 양 (창업자는 클리프 전이라 0, 재고는 2년 전이라 0)
+# 지금 꺼낼 수 있는 양 (창업자는 클리프 전이라 0, 재고는 1년 전이라 0)
 cast call <창업자베스팅> "releasable(address)(uint256)" <토큰주소> --rpc-url base_sepolia
 cast call <장기재고>     "releasable(address)(uint256)" <토큰주소> --rpc-url base_sepolia
 
-# 장기 재고 시작 시각 = 배포 시각 + 730일 이어야 합니다
+# 장기 재고 시작 시각 = 배포 시각 + 365일 이어야 합니다
 cast call <장기재고> "start()(uint256)" --rpc-url base_sepolia
 
 # 타임락 지연이 7일(604800초)인가
@@ -269,7 +269,7 @@ cast call <타임락> "hasRole(bytes32,address)(bool)"   $(cast keccak "EXECUTOR
 
 `foundry.toml`에 메인넷 설정이 들어 있지만, 지금 쓰지 마세요.
 메인넷에 올리면 **이름, 심볼, 총량, 베스팅 일정을 영원히 바꿀 수 없습니다.**
-장기 재고의 `start`(배포 +2년)와 타임락의 7일도 마찬가지로 앞당길 수 없습니다.
+장기 재고의 `start`(배포 +1년)와 타임락의 7일도 마찬가지로 앞당길 수 없습니다.
 
 메인넷 전 체크리스트는 `README.md` 하단에 있습니다.
 그 항목을 전부 통과하기 전에는 테스트넷에서만 움직이는 게 맞습니다.

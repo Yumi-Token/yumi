@@ -6,10 +6,10 @@ import {VestingWallet} from "@openzeppelin/contracts/finance/VestingWallet.sol";
 import {Token} from "../src/Token.sol";
 
 /**
- * @notice 장기 재고가 2년간 잠기고, 그 뒤 「한 번에 열리는 지점 없이」 풀리는지 검증합니다.
+ * @notice 장기 재고가 1년간 잠기고, 그 뒤 「한 번에 열리는 지점 없이」 풀리는지 검증합니다.
  *
  * 이 파일의 존재 이유는 test_NothingUnlocksAtOnceWhenVestingStarts 하나입니다.
- * 클리프를 썼다면 2년째에 13,000,000개(총량 13%)가 한꺼번에 열립니다. (D-008)
+ * 클리프를 썼다면 1년째에 21,666,666개(총량 21.7%)가 한꺼번에 열립니다. (D-008)
  */
 contract InventoryTest is Test {
     Token internal token;
@@ -20,8 +20,8 @@ contract InventoryTest is Test {
 
     uint64 internal deployedAt;
 
-    uint64 internal constant START_DELAY = 730 days; // 2년 뒤 시작
-    uint64 internal constant DURATION = 2920 days; // 이후 8년 선형
+    uint64 internal constant START_DELAY = 365 days; // 1년 뒤 시작
+    uint64 internal constant DURATION = 1095 days; // 이후 3년 선형
 
     uint256 internal constant INVENTORY = 65_000_000 ether;
 
@@ -47,7 +47,7 @@ contract InventoryTest is Test {
         assertEq(token.balanceOf(address(vesting)), INVENTORY);
     }
 
-    // ─── 2년간 한 개도 나오지 않는다 ────────────────────────
+    // ─── 1년간 한 개도 나오지 않는다 ────────────────────────
 
     function test_NothingReleasableAtDeploy() public view {
         assertEq(vesting.releasable(address(token)), 0);
@@ -78,8 +78,8 @@ contract InventoryTest is Test {
         uint256 oneDay = INVENTORY * 1 days / DURATION;
         assertApproxEqRel(vesting.releasable(address(token)), oneDay, 0.001e18);
 
-        // 하루치는 총량의 0.03% 미만입니다
-        assertLt(vesting.releasable(address(token)), 30_000 ether);
+        // 하루치는 65,000,000 / 1095 = 약 59,361개. 총량의 0.06% 미만입니다
+        assertLt(vesting.releasable(address(token)), 60_000 ether);
     }
 
     // ─── 이후 선형 해제 ────────────────────────────────────
@@ -87,9 +87,9 @@ contract InventoryTest is Test {
     function test_OneYearAfterStart() public {
         vm.warp(deployedAt + START_DELAY + 365 days);
 
-        uint256 expected = INVENTORY * 365 days / DURATION; // 약 8,125,000
+        uint256 expected = INVENTORY * 365 days / DURATION; // 약 21,666,666
         assertApproxEqRel(vesting.releasable(address(token)), expected, 0.001e18);
-        assertApproxEqRel(expected, 8_125_000 ether, 0.001e18);
+        assertApproxEqRel(expected, 21_666_666 ether, 0.001e18);
     }
 
     function test_FullyVestedAtEnd() public {
