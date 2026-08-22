@@ -12,7 +12,7 @@
 | | |
 |---|---|
 | 컴파일 | ✅ solc 0.8.28 (forge 1.5.1) |
-| 테스트 | ✅ **60개 통과** (Token 15 / FounderVesting 13 / Inventory 13 / Deployment 19) |
+| 테스트 | ✅ **62개 통과** (Token 15 / FounderVesting 13 / Inventory 13 / Deployment 21) |
 | 배포 스크립트 | ✅ 로컬 시뮬레이션 end-to-end 확인 |
 | 실측 스크립트 가스 | 3,182,788 |
 | 커스텀 코드 | **0줄** — 전부 OpenZeppelin 상속 또는 직접 사용 |
@@ -34,19 +34,111 @@ OpenZeppelin 구체 클래스를 배포 스크립트에서 그대로 `new` 합�
 | 운영·예비 | 10,000,000 | `TimelockController` | `minDelay` = 7일 |
 | 근거리 재고 | 5,000,000 | 트레저리 잔류 | 없음 |
 
-**두 베스팅의 수령 주소는 타임락입니다.** (D-015) 그래서 배포 순서가
-`TimelockController` → `Token` → 베스팅 둘 → 이체 순입니다. 순서를 바꾸지 마세요.
+**두 베스팅의 수령 주소는 타임락입니다.** (D-015)
 
-타임락 구성 — `proposers` = [운영자], `executors` = [`address(0)`], `admin` = `address(0)`.
-실행을 열어둔 것은 운영자 키 분실 시 물량이 영구히 잠기는 것을 막기 위해서이고,
-예약은 여전히 운영자만 할 수 있으므로 7일 지연은 그대로 강제됩니다.
+```
+0. Safe 2-of-3 생성 (app.safe.global, Base)   ← 신규. 주소 확보 (D-019)
+1. TimelockController      proposers = [Safe 주소]
+                           executors = [address(0)]
+                           admin     = address(0)
+2. Token                   전량이 배포 지갑으로
+3. FounderVesting          beneficiary = 타임락
+4. VestingWallet (재고)     beneficiary = 타임락, start = +730일
+5. 물량 이체 (20M / 65M / 10M)
+   ─ 1~5는 한 broadcast ─
+6. LP 5구간 생성 (4M)       배포 지갑에서
+7. LP 포지션 NFT → 타임락
+8. 남은 1M → Safe
+9. 배포 지갑 잔고 0 확인
+```
+
+**0번이 1번보다 먼저여야 합니다.** Safe 주소가 타임락 생성자 인자입니다.
+순서를 틀리면 재배포해야 하고, 그러면 이름·심볼을 태웁니다.
+
+타임락 구성 — `proposers` = [**Safe 2-of-3**], `executors` = [`address(0)`], `admin` = `address(0)`.
+실행을 열어둔 것은 키 분실 시 물량이 영구히 잠기는 것을 막기 위해서이고,
+예약은 여전히 Safe만 할 수 있으므로 7일 지연은 그대로 강제됩니다.
+
+### Safe 2-of-3 만들기 — 배포 전에
+
+**Safe는 지갑이 아니라 컨트랙트입니다.** 키를 보관하지 않고 **주소 목록과 정족수**만 저장합니다.
+그래서 **Safe 자체의 시드 문구는 없고, 서명자 키 3개가 곧 백업**입니다.
+
+**1) 서명자 지갑 3개 준비**
+
+| | 예시 | 조건 |
+|---|---|---|
+| ① | PC 메타마스크 또는 Foundry 키스토어 | 평소 사용 |
+| ② | 폰 지갑 앱 | **반드시 다른 기기** |
+| ③ | 종이에 적어 금고 | 오프라인. 평소 안 씀 |
+
+각각의 **주소**만 있으면 됩니다.
+
+**2) Safe 생성**
+
+`app.safe.global` → **Base 네트워크** 선택 → ①번 지갑 연결
+→ 주소 3개 입력, 정족수 **2** → 생성 (가스 몇 센트)
+
+**3) 나온 Safe 주소를 `.env`의 `SAFE_ADDRESS`에 넣습니다.**
+
+**테스트넷에서도 Safe를 만드세요.** 배포 스크립트가 EOA를 거부합니다. 메인넷에서 처음 써보면 늦습니다.
+
+### 쓰는 법
+
+```
+①번 지갑으로 접속 → 트랜잭션 제안 + 서명   (1/2)
+②번 지갑으로 접속 → 승인 + 서명           (2/2) → 자동 실행
+```
+
+두 번째 서명이 들어가는 순간 실행됩니다. 별도 실행 버튼이 없습니다.
+③번은 ①이나 ②를 잃거나 털렸을 때만 꺼냅니다.
+
+### ⚠️ 주의
+
+- **`app.safe.global`을 북마크하고 검색으로 들어가지 마세요.** 가짜 사이트가 광고로 뜹니다
+- **서명할 때 내용을 읽으세요.** 2-of-3이어도 두 번 다 잘못 승인하면 통과합니다
+- **③번 키를 편하다고 PC나 클라우드에 두지 마세요.** 그 순간 2-of-3이 사실상 1-of-1이 됩니다
+
+### 키 관리
+
+Foundry 공식 권고를 따릅니다 — **테스트넷은 암호화 키스토어, 메인넷은 하드웨어(권장).**
+
+```bash
+cast wallet import deployer --interactive
+forge script script/Deploy.s.sol --account deployer --rpc-url base_sepolia --broadcast --verify
+```
+
+**그리고 `.env`에서 `PRIVATE_KEY` 줄을 비웁니다.** 키스토어를 만들어놓고 평문을 남기면 의미가 없습니다.
+
+**하드웨어 지갑은 「권장」이지 「필수」가 아닙니다.** Safe 2-of-3이 들어가면 단일 키 유출 손실이 0이 되므로 한계 효용이 낮습니다. 유일하게 남는 단일 키 구간은 아래 **배포 순간**이고, 그것도 일회용 새 키로 상당 부분 완화됩니다. 하드웨어는 **"내 컴퓨터가 이미 감염됐을 수도 있다"에 대한 보험**으로 평가하면 됩니다.
+
+**⚠️ 가장 위험한 시간 — 배포하는 몇 분**
+
+`forge script --broadcast`는 트랜잭션을 **순차 전송**하므로, 토큰 배포 직후 ~ 이체 완료 전까지 **배포 지갑에 1억 개 전량이 있는 순간이 실재합니다.**
+
+> **완화책: 배포 키를 그 배포만을 위해 새로 만들고, 끝나면 비우고 폐기합니다.**
+
+**⚠️ Windows 주의** — WSL2는 USB를 기본 지원하지 않아 하드웨어 지갑이 안 잡힙니다(`usbipd-win` 필요). 하드웨어를 쓸 거면 네이티브 Windows가 편합니다. `--ledger` 실패 사례가 Foundry 이슈로 다수 보고돼 있으니 **반드시 테스트넷에서 먼저 성공시키세요.**
+
+### 지갑을 용도별로 나눕니다
+
+| 용도 | 지갑 | 빈도 |
+|---|---|---|
+| 배포·LP 설치 | 배포 지갑 (일회용, 끝나면 비움) | 1회 |
+| 타임락 예약·실행 | **Safe 2-of-3** | 분기 1회 |
+| 근거리 재고 1M 보관 | **Safe 2-of-3** | 필요시 |
+| **주간 기록 해시** | **소액 핫월렛** | **매주** |
+
+주간 해시는 가스비만 필요하고 털려도 잃을 게 없습니다. 매주 Safe를 꺼내는 건 지속되지 않으므로 별도 소액 지갑을 씁니다. **그 주소도 `WALLETS.md`에 공개합니다** — 종료 조건 판정 근거라 어차피 공개돼야 합니다.
+
+⚠️ **근거리 재고 1M을 Safe에 두는 것은 「잠금」이 아닙니다.** Safe는 서명 2개면 즉시 움직이고 타임락을 거치지 않습니다. **「예고 없이 움직일 수 있는 양 1%」는 그대로입니다.** 문서에 이 1M이 7일 예약 대상인 것처럼 쓰지 마세요. (D-014)
 
 ### 테스트가 고정하는 주장
 
 | 테스트 | 고정하는 것 |
 |---|---|
 | `test_BothVestingBeneficiariesAreTimelock` | 해제분이 지갑으로 직행하지 않음 (D-015) |
-| `test_NothingReachesDeployerDirectlyAfterTenYears` | 10년 뒤에도 88%가 되지 않음 |
+| `test_NothingReachesDeployerDirectlyAfterTenYears` | 10년 뒤에도 86%가 되지 않음 |
 | `test_NothingUnlocksAtOnceWhenVestingStarts` | 재고에 한 번에 열리는 지점 없음 (D-008) |
 | `test_DeployScriptUsesTheSameNumbers` | **배포 스크립트 상수 ↔ 테스트 숫자** |
 | `test_NoExternalAdmin` / `test_ExecutionIsOpenToAnyone` | 타임락 권한 구성 |
@@ -63,8 +155,10 @@ OpenZeppelin 구체 클래스를 배포 스크립트에서 그대로 `new` 합�
 
 ### 1. 테스트넷 배포
 
-`START-HERE.md`의 4~7번을 따르세요. `.env`에 필요한 것은 둘입니다:
-`PRIVATE_KEY`, `OPERATOR_ADDRESS`. **`FOUNDER_ADDRESS`는 더 이상 쓰지 않습니다.**
+**Safe를 먼저 만드세요** (위 「Safe 2-of-3 만들기」). 그 다음 `START-HERE.md`의 4~7번.
+
+`.env`에 필요한 것은 셋입니다 — `PRIVATE_KEY`(또는 키스토어), `SAFE_ADDRESS`, `ETHERSCAN_API_KEY`.
+**`OPERATOR_ADDRESS`와 `FOUNDER_ADDRESS`는 더 이상 쓰지 않습니다.**
 
 ### 2. 네 주소를 `docs/WALLETS.md`에 기입 → Basescan 검증 4건
 
@@ -172,6 +266,9 @@ OpenZeppelin 구체 클래스를 배포 스크립트에서 그대로 `new` 합�
 - ❌ 장기 재고·타임락을 감싸는 래퍼 컨트랙트 — OpenZeppelin을 그대로 쓰는 게 요점입니다
 - ❌ 베스팅 수령 주소를 지갑으로 되돌리기 (D-015)
 - ❌ 타임락 `executors`에서 `address(0)` 제거 — 키 분실 시 브릭됩니다
+- ❌ 타임락 `proposers`에 EOA 넣기 — 키 하나가 예약과 취소를 독점하면 영구 동결입니다 (D-007, D-019)
+- ❌ `SAFE_ADDRESS` 미설정 시 폴백 되살리기 — 조용히 배포 지갑이 운영자가 됩니다
+- ❌ 거부권(veto) 키 재론 — D-019에서 기각했고 배포 전에만 넣을 수 있습니다
 - ❌ `Deploy.s.sol` 상수를 `internal`로 되돌리기 — 드리프트 탐지가 사라집니다
 - ❌ 조건부 소각 로직 — 커스텀 코드가 되고 감사 대상이 생깁니다
 - ❌ 에어드랍·머클 배포 컨트랙트 (D-005)

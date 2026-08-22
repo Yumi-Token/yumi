@@ -23,7 +23,7 @@
 
 | 항목 | 상태 |
 |---|---|
-| 컨트랙트 | 작성 완료, 테스트 60개 통과 |
+| 컨트랙트 | 작성 완료, 테스트 62개 통과 |
 | 테스트넷 배포 | 아직 |
 | 메인넷 배포 | 아직 |
 | 이름·심볼 | **미정** (6주차쯤 확정) |
@@ -78,10 +78,12 @@ OpenZeppelin `VestingWalletCliff` 표준을 그대로 씁니다.
 ### 두 베스팅의 수령 주소는 지갑이 아니라 타임락입니다 (D-015)
 
 해제된 물량이 발행자 지갑으로 직행하면 그 순간부터 마찰이 0이고,
-「예고 없이 움직일 수 있는 양 1%」는 배포 후 180일짜리 숫자가 됩니다. 10년 뒤에는 88%고요.
+「예고 없이 움직일 수 있는 양 1%」는 배포 후 180일짜리 숫자가 됩니다. 10년 뒤에는 86%고요.
 
 수령 주소가 타임락이면 **해제는 잠금을 푸는 것이 아니라 한 칸 앞으로 옮기는 것**이 됩니다.
 빼려면 여전히 7일 공개 예약을 거쳐야 합니다.
+
+타임락에 예약을 걸 수 있는 것은 **Safe 2-of-3 멀티시그**입니다. → [`docs/SECURITY.md`](docs/SECURITY.md)
 
 ---
 
@@ -118,8 +120,8 @@ forge test
 
 이미 서브모듈 없이 받았다면 `git submodule update --init --recursive`.
 
-**60개 테스트가 전부 통과해야 합니다.**
-(Token 15 / FounderVesting 13 / Inventory 13 / Deployment 19)
+**62개 테스트가 전부 통과해야 합니다.**
+(Token 15 / FounderVesting 13 / Inventory 13 / Deployment 21)
 
 라이브러리는 `forge-std` v1.16.2, `openzeppelin-contracts` **v5.4.0**으로 고정돼 있습니다.
 OpenZeppelin 버전을 함부로 올리지 마세요 — `VestingWallet`의 해제 계산이나
@@ -129,7 +131,7 @@ OpenZeppelin 버전을 함부로 올리지 마세요 — `VestingWallet`의 해�
 
 ```bash
 cp .env.example .env
-# .env 를 열어 PRIVATE_KEY, ETHERSCAN_API_KEY, OPERATOR_ADDRESS 를 채웁니다
+# .env 를 열어 PRIVATE_KEY, ETHERSCAN_API_KEY, SAFE_ADDRESS 를 채웁니다
 
 forge script script/Deploy.s.sol \
   --rpc-url base_sepolia \
@@ -153,8 +155,8 @@ Basescan에서 **소스 검증이 완료됐는지 반드시 확인**하세요.
 - [ ] 두 베스팅의 `owner()` 가 타임락 주소다 (D-015)
 - [ ] 타임락에 외부 admin이 없다 (`hasRole(DEFAULT_ADMIN_ROLE, 배포지갑) == false`)
 - [ ] 타임락 실행이 열려 있다 (`hasRole(EXECUTOR_ROLE, address(0)) == true`) — 키 분실 시 브릭 방지
-- [ ] `OPERATOR_ADDRESS` 가 배포 지갑과 분리돼 있다
-- [ ] 하드웨어 지갑을 쓴다 (`--ledger`)
+- [ ] `SAFE_ADDRESS` 가 Safe 2-of-3 컨트랙트 주소다 (EOA 아님)
+- [ ] 배포 키가 이 배포 전용으로 새로 만든 키다
 - [ ] 배포 직후 `docs/WALLETS.md` 를 갱신할 준비가 됐다
 - [ ] 0주차 기록을 쓸 준비가 됐다
 

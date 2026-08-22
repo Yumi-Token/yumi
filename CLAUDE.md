@@ -120,6 +120,12 @@ AI가 미끄러지는 것을 잡는 것**입니다.
 `docs/DECISIONS.md` D-001을 상기시켜 주세요. 그래도 원하면 존중하되,
 **별도 컨트랙트로 분리**하고 토큰 자체는 건드리지 않는 방향을 제안하세요.
 
+### 타임락 운영자를 개인 지갑으로 되돌리지 않습니다
+
+`proposers`에 EOA를 넣으면 그 키 하나가 **예약과 취소를 동시에** 쥡니다.
+유출되면 도난이 아니라 **영구 동결**입니다 — 공격자도 못 가져가지만 발행자도 못 옮깁니다.
+`SAFE_ADDRESS` 폴백을 되살리거나 `code.length` 검사를 빼는 제안을 하지 마세요. (D-007, D-019)
+
 ### 수익을 약속하는 문구를 쓰지 않습니다
 
 문서, 로그, 커밋 메시지, README 어디에도:
@@ -229,7 +235,7 @@ Deploy 상수와 테스트 숫자를 묶어두지만, **문서까지 묶어주�
 
 ```bash
 forge build          # 컴파일
-forge test           # 테스트 (60개 통과해야 정상)
+forge test           # 테스트 (62개 통과해야 정상)
 forge test -vvv      # 실패 시 상세 출력
 forge fmt            # 포맷
 forge test --gas-report
@@ -282,5 +288,6 @@ Solidity에서 한글이 들어간 문자열 리터럴은 `unicode"..."` 접두�
 - `docs/TOKENOMICS.md` — 배분과 근거 (숫자의 단일 출처)
 - `docs/WALLETS.md` — 공개 지갑 주소
 - `docs/UTILITY.md` — 유틸리티를 붙일 조건 (지금은 안 붙입니다)
+- `docs/SECURITY.md` — 키와 서명 (컨트랙트 보안 아님)
 - `docs/DECISIONS.md` — 결정 기록 (새 결정은 여기에)
 - `log/` — 주간 기록

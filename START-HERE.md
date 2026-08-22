@@ -7,7 +7,7 @@
 
 ## 0. 지금 이 폴더에 들어 있는 것
 
-컨트랙트 2개, 테스트 **60개**, 배포 스크립트 1개, 문서 7개, 0주차 선언문 초안.
+컨트랙트 2개, 테스트 **62개**, 배포 스크립트 1개, 문서 7개, 0주차 선언문 초안.
 **컴파일과 테스트는 이미 통과한 상태**입니다. 배포 스크립트도 로컬에서 끝까지 돌려봤습니다.
 
 트레저리 4분할(창업자 베스팅 / 장기 재고 / 운영 타임락 / 근거리 재고)이
@@ -122,10 +122,10 @@ forge test
 Suite result: ok. 15 passed; 0 failed  (Token)
 Suite result: ok. 13 passed; 0 failed  (FounderVesting)
 Suite result: ok. 13 passed; 0 failed  (Inventory)
-Suite result: ok. 19 passed; 0 failed  (Deployment)
+Suite result: ok. 21 passed; 0 failed  (Deployment)
 ```
 
-**60개가 전부 통과해야 정상입니다.** 하나라도 실패하면 그 상태로 멈추고 알려주세요.
+**62개가 전부 통과해야 정상입니다.** 하나라도 실패하면 그 상태로 멈추고 알려주세요.
 
 ---
 
@@ -143,7 +143,7 @@ Suite result: ok. 19 passed; 0 failed  (Deployment)
 | `.env` 항목 | 역할 | 비우면 |
 |---|---|---|
 | `PRIVATE_KEY` | 배포 지갑 = 트레저리. 근거리 재고 5,000,000을 들고 있게 됩니다 | 필수 |
-| `OPERATOR_ADDRESS` | 타임락에 **예약을 걸 수 있는** 주소 | 배포 지갑 |
+| `SAFE_ADDRESS` | 타임락에 **예약을 걸 수 있는** Safe 2-of-3 주소 | **필수 — 비우면 배포 실패** |
 
 창업자 물량을 받을 주소는 따로 넣지 않습니다. **두 베스팅의 수령 주소가 타임락**이라
 해제분도 타임락으로 들어가고, 빼려면 7일 예약을 거치기 때문입니다. (D-015)
@@ -232,7 +232,7 @@ cast call <토큰주소> "balanceOf(address)(uint256)" <장기재고>     --rpc-
 cast call <토큰주소> "balanceOf(address)(uint256)" <타임락>       --rpc-url base_sepolia
 cast call <토큰주소> "balanceOf(address)(uint256)" <배포지갑>     --rpc-url base_sepolia
 
-# ★ 두 베스팅의 수령 주소가 타임락인가 (D-015 — 여기가 틀리면 10년 뒤 88%입니다)
+# ★ 두 베스팅의 수령 주소가 타임락인가 (D-015 — 여기가 틀리면 10년 뒤 86%입니다)
 cast call <창업자베스팅> "owner()(address)" --rpc-url base_sepolia
 cast call <장기재고>     "owner()(address)" --rpc-url base_sepolia
 
