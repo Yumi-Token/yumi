@@ -9,70 +9,70 @@ import {FounderVesting} from "../src/FounderVesting.sol";
 
 /**
  * @title Deploy
- * @notice 토큰을 배포하고, 트레저리를 네 갈래로 나눠 같은 묶음 안에서 전부 잠급니다.
+ * @notice 토큰과 세 개의 잠금 장치를 한 묶음으로 배포합니다.
  *
  * 실행:
  *   테스트넷  forge script script/Deploy.s.sol --rpc-url base_sepolia --broadcast --verify
  *   메인넷    forge script script/Deploy.s.sol --rpc-url base       --broadcast --verify
  *
- * 이 스크립트가 하는 일:
- *   1. Token 배포 — 전량이 배포자(=treasury) 주소로 발행됩니다
- *   2. FounderVesting 배포 → 20,000,000 이체   (6개월 클리프 + 24개월 선형)
- *   3. VestingWallet 배포  → 65,000,000 이체   (2년 뒤 시작 + 8년 선형)
- *   4. TimelockController 배포 → 10,000,000 이체 (7일 지연)
- *   5. 남은 5,000,000 은 트레저리에 그대로 — 근거리 재고
+ * ─── 배포 순서가 중요합니다 (D-015) ───────────────────────────
  *
- * 전부 한 broadcast 안에서 끝납니다. "아직 안 잠긴" 상태가 존재하지 않습니다. (D-004)
+ *   1. TimelockController   ← 반드시 먼저. 두 베스팅이 이 주소를 받습니다
+ *   2. Token                  전량이 deployer(=treasury)에게 발행
+ *   3. FounderVesting         beneficiary = 타임락
+ *   4. VestingWallet (재고)   beneficiary = 타임락, 2년 뒤 시작
+ *   5. 물량 이체 3건
  *
- * 새로 짠 컨트랙트는 0줄입니다. 3·4번은 OpenZeppelin 구체 클래스를 그대로 `new` 합니다. (D-001)
+ * 베스팅의 수령 주소를 발행자 지갑이 아니라 타임락으로 두는 이유:
+ *
+ *   해제된 물량이 발행자 지갑으로 바로 가면 그 순간부터 마찰이 0입니다.
+ *   그러면 "예고 없이 움직일 수 있는 양 3%"는 배포 후 180일짜리 숫자가 되고,
+ *   10년 뒤에는 88%가 됩니다.
+ *
+ *   수령 주소가 타임락이면 해제분이 타임락으로 들어가고, 빼려면 7일 공개 예약을
+ *   거칩니다. 해제는 잠금을 푸는 것이 아니라 한 칸 앞으로 옮기는 것이 됩니다.
+ *   덤으로 transferOwnership(수령권 매각)도 7일 예약을 거치게 됩니다.
+ *
+ * ─── 새로 짠 컨트랙트는 없습니다 ──────────────────────────────
+ *
+ *   VestingWallet, VestingWalletCliff, TimelockController 전부 OpenZeppelin
+ *   표준입니다. 감사할 커스텀 코드는 여전히 0줄입니다. (D-001)
  */
 contract Deploy is Script {
-    // ─── 배포 전에 반드시 확인할 값들 ────────────────────────
-    // 이름과 심볼은 배포 후 변경이 불가능합니다.
-    // 테스트넷에서는 아무 값이나 써도 되지만, 메인넷 전에 확정하세요.
+    // ─── 배포 후 변경 불가 ──────────────────────────────────
+    // 이름과 심볼은 영원히 바꿀 수 없습니다. 메인넷 전에 확정하세요.
 
     string internal constant TOKEN_NAME = "Test Token";
     string internal constant TOKEN_SYMBOL = "TEST";
 
-    // ─── 배분 (docs/TOKENOMICS.md 와 반드시 일치) ─────────────
-    // public 인 이유: test/Allocation.t.sol 이 이 값을 직접 읽어서
-    // 문서와 코드가 어긋나는 순간 테스트가 깨지도록 하기 위해서입니다.
+    // ─── 배분 (합이 정확히 INITIAL_SUPPLY여야 합니다) ────────
+    //
+    // public 인 이유는 test/Deployment.t.sol 이 이 값을 직접 읽어
+    // 문서의 숫자와 대조하기 때문입니다. 여기만 고치고 문서를 안 고치면
+    // 테스트가 깨집니다 — 그게 목적입니다.
 
-    /// @dev 창업자 배정 — 총량의 20%
-    uint256 public constant FOUNDER_ALLOCATION = 20_000_000 ether;
+    uint256 public constant FOUNDER_ALLOCATION = 20_000_000 ether; // 20%
+    uint256 public constant INVENTORY_ALLOCATION = 65_000_000 ether; // 65%
+    uint256 public constant OPERATIONS_ALLOCATION = 10_000_000 ether; // 10%
+    uint256 public constant NEAR_TERM_ALLOCATION = 5_000_000 ether; // 5% — treasury에 잔류
 
-    /// @dev 장기 유동성 공급 재고 — 총량의 65%. 「커뮤니티 배정」이 아닙니다 (D-005)
-    uint256 public constant INVENTORY_ALLOCATION = 65_000_000 ether;
+    // ─── 창업자 베스팅: 6개월 클리프 + 24개월 선형 ──────────
 
-    /// @dev 운영·예비 — 총량의 10%. 7일 타임락에 보관
-    uint256 public constant OPERATIONS_ALLOCATION = 10_000_000 ether;
-
-    /// @dev 근거리 재고 — 총량의 5%. 별도 이체 없이 트레저리에 남습니다
-    uint256 public constant NEAR_TERM_INVENTORY = 5_000_000 ether;
-
-    // ─── 창업자 베스팅 (D-003) ───────────────────────────────
-
-    /// @dev 6개월 클리프
     uint64 public constant CLIFF_SECONDS = 180 days;
-
-    /// @dev 24개월 선형 베스팅
     uint64 public constant VESTING_DURATION = 730 days;
 
-    // ─── 장기 재고 (D-008) ───────────────────────────────────
+    // ─── 장기 재고: 2년 뒤 시작, 이후 8년 선형 ───────────────
     //
-    // 클리프를 쓰지 않습니다. OpenZeppelin은 선형 계산의 기준점이
-    // 클리프가 아니라 start라서, 「2년 클리프」로 걸면 2년째에
-    // 13,000,000개가 한 번에 열립니다. 그래서 start 자체를 2년 뒤로 미룹니다.
+    // 클리프를 쓰지 않는 이유 (D-008):
+    //   OpenZeppelin은 선형 계산의 기준점이 클리프가 아니라 start입니다.
+    //   "2년 클리프 + 10년 선형"으로 걸면 2년째에 13,000,000개(총량 13%)가
+    //   한 번에 열립니다. start를 미래로 미루면 그런 지점이 없습니다.
 
-    /// @dev 배포 +2년부터 해제가 시작됩니다
     uint64 public constant INVENTORY_START_DELAY = 730 days;
-
-    /// @dev 시작 이후 8년에 걸쳐 선형 해제
     uint64 public constant INVENTORY_DURATION = 2920 days;
 
-    // ─── 운영 타임락 (D-007) ─────────────────────────────────
+    // ─── 타임락 ─────────────────────────────────────────────
 
-    /// @dev 7일. 주간 기록 주기와 맞춰 예약이 곧 사전 공지가 됩니다
     uint256 public constant TIMELOCK_MIN_DELAY = 7 days;
 
     function run()
@@ -80,7 +80,7 @@ contract Deploy is Script {
         returns (
             Token token,
             FounderVesting founderVesting,
-            VestingWallet inventory,
+            VestingWallet inventoryVesting,
             TimelockController timelock
         )
     {
@@ -88,87 +88,103 @@ contract Deploy is Script {
         uint256 deployerKey = vm.envUint("PRIVATE_KEY");
         address deployer = vm.addr(deployerKey);
 
-        // 창업자 물량 수령 주소. 배포 지갑과 다른 주소를 권장합니다.
-        address founder = vm.envOr("FOUNDER_ADDRESS", deployer);
+        // 타임락에 예약을 걸 수 있는 주소. 미설정 시 배포 지갑을 씁니다.
+        address operator = vm.envOr("OPERATOR_ADDRESS", deployer);
 
-        // 운영 지갑 — 장기 재고의 수령인이자 타임락의 제안·실행자입니다.
-        address operations = vm.envOr("OPERATIONS_ADDRESS", deployer);
+        _assertAllocationsSumToSupply();
 
         console2.log("=== Deploy ===");
         console2.log("chain id      :", block.chainid);
         console2.log("deployer      :", deployer);
-        console2.log("founder       :", founder);
-        console2.log("operations    :", operations);
-
-        // 타임락 권한 구성 — 제안자와 실행자 모두 운영 지갑입니다.
-        address[] memory proposers = new address[](1);
-        proposers[0] = operations;
-        address[] memory executors = new address[](1);
-        executors[0] = operations;
+        console2.log("operator      :", operator);
+        if (operator == deployer) {
+            console2.log(unicode"   ! OPERATOR_ADDRESS 미설정 - 배포 지갑을 그대로 씁니다");
+        }
 
         vm.startBroadcast(deployerKey);
 
-        // 1. 토큰 — 전량이 deployer에게 발행됩니다
+        // ── 1. 타임락 (가장 먼저) ────────────────────────────
+        //
+        // proposers  : operator 하나. PROPOSER와 CANCELLER 역할이 함께 부여됩니다
+        // executors  : address(0) = 누구나 실행 가능
+        //              operator만 넣으면 키 분실 시 물량이 영구히 잠깁니다.
+        //              예약은 여전히 proposer만 할 수 있으므로 위험하지 않습니다
+        // admin      : address(0) = 외부 admin 없음
+        //              나중에 renounce할 필요가 없도록 처음부터 안 만듭니다
+
+        address[] memory proposers = new address[](1);
+        proposers[0] = operator;
+
+        address[] memory executors = new address[](1);
+        executors[0] = address(0);
+
+        timelock = new TimelockController(TIMELOCK_MIN_DELAY, proposers, executors, address(0));
+
+        // ── 2. 토큰 — 전량이 deployer에게 발행 ───────────────
         token = new Token(TOKEN_NAME, TOKEN_SYMBOL, deployer);
 
-        // 2. 창업자 베스팅 — 지금 이 순간부터 시계가 돕니다
-        founderVesting = new FounderVesting(founder, uint64(block.timestamp), VESTING_DURATION, CLIFF_SECONDS);
-        token.transfer(address(founderVesting), FOUNDER_ALLOCATION);
+        // ── 3. 창업자 베스팅 — 수령 주소는 타임락 ────────────
+        founderVesting =
+            new FounderVesting(address(timelock), uint64(block.timestamp), VESTING_DURATION, CLIFF_SECONDS);
 
-        // 3. 장기 재고 — 클리프가 아니라 시작 시각을 2년 뒤로 미룹니다 (D-008)
-        inventory = new VestingWallet(
-            operations, uint64(block.timestamp) + INVENTORY_START_DELAY, INVENTORY_DURATION
+        // ── 4. 장기 재고 베스팅 — 2년 뒤 시작, 수령 주소는 타임락
+        inventoryVesting = new VestingWallet(
+            address(timelock), uint64(block.timestamp) + INVENTORY_START_DELAY, INVENTORY_DURATION
         );
-        token.transfer(address(inventory), INVENTORY_ALLOCATION);
 
-        // 4. 운영·예비 — 7일 타임락
+        // ── 5. 물량 이체 — 같은 묶음에서 끝냅니다 ────────────
         //
-        //    마지막 인자(admin)를 address(0)으로 둡니다. 관리자 권한을 나중에
-        //    포기하는 대신 처음부터 만들지 않습니다 — "나중에 잠그겠다"는
-        //    상태가 존재하지 않도록 (D-004, D-013의 구조 예외).
-        //
-        //    권한이 사라지는 것은 아닙니다. 타임락 자신이 관리자이므로
-        //    역할 변경이나 지연 시간 변경도 7일 예약을 거쳐 할 수 있습니다.
-        timelock = new TimelockController(TIMELOCK_MIN_DELAY, proposers, executors, address(0));
+        // "아직 안 잠긴" 상태가 존재하면 안 됩니다. (D-004)
+        token.transfer(address(founderVesting), FOUNDER_ALLOCATION);
+        token.transfer(address(inventoryVesting), INVENTORY_ALLOCATION);
         token.transfer(address(timelock), OPERATIONS_ALLOCATION);
-
-        // 5. 남은 5,000,000 (근거리 재고)은 트레저리에 그대로 둡니다. 이체 없음.
+        // 남은 NEAR_TERM_ALLOCATION은 deployer에 잔류합니다
 
         vm.stopBroadcast();
 
-        // ─── 자기 점검 — 배분이 어긋난 채로 끝나지 않도록 ──────
-        require(
-            FOUNDER_ALLOCATION + INVENTORY_ALLOCATION + OPERATIONS_ALLOCATION + NEAR_TERM_INVENTORY
-                == token.INITIAL_SUPPLY(),
-            "allocation sum != INITIAL_SUPPLY"
-        );
-        require(token.balanceOf(deployer) == NEAR_TERM_INVENTORY, "treasury remainder != 5,000,000");
+        _report(token, founderVesting, inventoryVesting, timelock, deployer);
+    }
+
+    /// @dev 배분 합계가 총 발행량과 다르면 배포를 중단합니다.
+    function _assertAllocationsSumToSupply() internal pure {
+        uint256 sum = FOUNDER_ALLOCATION + INVENTORY_ALLOCATION + OPERATIONS_ALLOCATION + NEAR_TERM_ALLOCATION;
+        require(sum == 100_000_000 ether, "allocations != INITIAL_SUPPLY");
+    }
+
+    function _report(
+        Token token,
+        FounderVesting founderVesting,
+        VestingWallet inventoryVesting,
+        TimelockController timelock,
+        address deployer
+    ) internal view {
+        console2.log("");
+        console2.log("--- addresses (docs/WALLETS.md) ---");
+        console2.log("token             :", address(token));
+        console2.log("timelock          :", address(timelock));
+        console2.log("founder vesting   :", address(founderVesting));
+        console2.log("inventory vesting :", address(inventoryVesting));
+        console2.log("treasury          :", deployer);
 
         console2.log("");
-        console2.log("token           :", address(token));
-        console2.log("founderVesting  :", address(founderVesting));
-        console2.log("inventory       :", address(inventory));
-        console2.log("timelock        :", address(timelock));
+        console2.log("--- balances (whole tokens) ---");
+        console2.log("total supply      :", token.totalSupply() / 1e18);
+        console2.log("founder locked    :", token.balanceOf(address(founderVesting)) / 1e18);
+        console2.log("inventory locked  :", token.balanceOf(address(inventoryVesting)) / 1e18);
+        console2.log("operations (lock) :", token.balanceOf(address(timelock)) / 1e18);
+        console2.log("near-term (free)  :", token.balanceOf(deployer) / 1e18);
 
         console2.log("");
-        console2.log("total supply    :", token.totalSupply() / 1e18);
-        console2.log("founder locked  :", token.balanceOf(address(founderVesting)) / 1e18);
-        console2.log("inventory locked:", token.balanceOf(address(inventory)) / 1e18);
-        console2.log("timelock held   :", token.balanceOf(address(timelock)) / 1e18);
-        console2.log("treasury left   :", token.balanceOf(deployer) / 1e18);
+        console2.log("--- schedule (unix seconds) ---");
+        console2.log("founder cliff ends:", founderVesting.cliff());
+        console2.log("founder ends      :", founderVesting.start() + founderVesting.duration());
+        console2.log("inventory starts  :", inventoryVesting.start());
+        console2.log("inventory ends    :", inventoryVesting.start() + inventoryVesting.duration());
+        console2.log("timelock delay    :", timelock.getMinDelay());
 
         console2.log("");
-        console2.log("founder cliff ends  :", founderVesting.cliff());
-        console2.log("founder vest ends   :", founderVesting.start() + founderVesting.duration());
-        console2.log("inventory starts    :", inventory.start());
-        console2.log("inventory ends      :", inventory.start() + inventory.duration());
-        console2.log("timelock min delay  :", timelock.getMinDelay());
-
-        console2.log("");
-        console2.log(unicode"-> docs/WALLETS.md 에 위 네 주소를 전부 기록하세요.");
-        console2.log(unicode"-> Basescan 소스 검증이 끝났는지 반드시 확인하세요.");
-        console2.log(
-            unicode"-> 예고 없이 움직일 수 있는 양은 트레저리 잔량 5,000,000 뿐입니다."
-        );
+        console2.log(unicode"-> 위 주소를 docs/WALLETS.md 에 기록하세요.");
+        console2.log(unicode"-> 두 베스팅의 owner() 가 timelock 주소와 같은지 확인하세요.");
+        console2.log(unicode"-> Basescan 소스 검증이 끝났는지 확인하세요.");
     }
 }

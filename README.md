@@ -23,7 +23,7 @@
 
 | 항목 | 상태 |
 |---|---|
-| 컨트랙트 | 작성 완료, 테스트 67개 통과 |
+| 컨트랙트 | 작성 완료, 테스트 60개 통과 |
 | 테스트넷 배포 | 아직 |
 | 메인넷 배포 | 아직 |
 | 이름·심볼 | **미정** (6주차쯤 확정) |
@@ -61,20 +61,27 @@ OpenZeppelin `VestingWalletCliff` 표준을 그대로 씁니다.
 > 선형 계산의 기준점이 클리프가 아니라 시작 시각이기 때문이며, OpenZeppelin 표준 동작입니다.
 > 이 사실은 공개 문서에 반드시 명시해야 합니다.
 
-### 새로 짠 코드가 없는 나머지 둘
+### 나머지 둘은 새로 짜지 않았습니다
 
 장기 재고와 운영 물량은 **OpenZeppelin 구체 클래스를 배포 스크립트에서 그대로 씁니다.**
 래퍼도, 상속도, 커스텀 로직도 없습니다.
 
 | 용도 | 쓰는 것 | 설정 |
 |---|---|---|
-| 장기 재고 65,000,000 | `VestingWallet` | `start` = 배포 +2년, `duration` = 8년 |
-| 운영·예비 10,000,000 | `TimelockController` | `minDelay` = 7일, 외부 관리자 없음 |
+| 장기 재고 | `VestingWallet` | `start` = 배포 +2년, `duration` = 8년, **클리프 없음** |
+| 운영·예비 + LP NFT | `TimelockController` | `minDelay` = 7일, 외부 admin 없음, 실행은 누구나 |
 
-장기 재고에 **클리프를 쓰지 않았습니다.** OpenZeppelin은 선형 계산의 기준점이
-클리프가 아니라 `start`라서, 「2년 클리프」로 걸면 2년째에 13,000,000개(총량 13%)가
+장기 재고에 클리프를 쓰지 않은 이유는 D-008입니다. OpenZeppelin은 선형 계산의
+기준점이 클리프가 아니라 `start`라서, 「2년 클리프」로 걸면 2년째에 13,000,000개가
 한 번에 열립니다. 그래서 클리프 대신 시작 시각 자체를 2년 뒤로 미뤘습니다.
-([DECISIONS.md](docs/DECISIONS.md) D-008)
+
+### 두 베스팅의 수령 주소는 지갑이 아니라 타임락입니다 (D-015)
+
+해제된 물량이 발행자 지갑으로 직행하면 그 순간부터 마찰이 0이고,
+「예고 없이 움직일 수 있는 양 3%」는 배포 후 180일짜리 숫자가 됩니다. 10년 뒤에는 88%고요.
+
+수령 주소가 타임락이면 **해제는 잠금을 푸는 것이 아니라 한 칸 앞으로 옮기는 것**이 됩니다.
+빼려면 여전히 7일 공개 예약을 거쳐야 합니다.
 
 ---
 
@@ -82,33 +89,10 @@ OpenZeppelin `VestingWalletCliff` 표준을 그대로 씁니다.
 
 총 발행량 **100,000,000** (1억, 18 decimals) 고정. 추가 발행 불가.
 
-| 버킷 | 수량 | 비율 | 잠금 |
-|---|---|---|---|
-| 창업자 (베스팅) | 20,000,000 | 20% | 6개월 클리프 + 24개월 선형 |
-| 장기 유동성 공급 재고 | 65,000,000 | 65% | 배포 +2년부터 8년 선형 |
-| 근거리 재고 | 5,000,000 | 5% | 없음 (주소 공개) |
-| 운영·예비 | 10,000,000 | 10% | 7일 타임락 |
+**배분과 그 근거는 [`docs/TOKENOMICS.md`](docs/TOKENOMICS.md)가 유일한 출처입니다.**
 
-**65,000,000을 「커뮤니티 배정」이라고 부르지 않습니다.** 나눠줄 계획이 없는 물량을
-배정이라 부르면 거짓말이 됩니다. 배분은 무상 배포가 아니라 시장에서 사는 것으로 이루어집니다.
-에어드랍은 지금 하지 않습니다. ([DECISIONS.md](docs/DECISIONS.md) D-005)
-
-### 예고 없이 움직일 수 있는 양 = 총량의 3%
-
-사려는 사람이 실제로 확인하는 숫자이고, `test/Allocation.t.sol`이 이걸 고정합니다.
-
-| 버킷 | 예고 없이 움직일 수 있는 양 |
-|---|---|
-| 창업자 20M | 0 (클리프) |
-| 장기 재고 65M | 0 (2년간 잠김) |
-| 운영 10M | 0 (7일 공개 예약 필요) |
-| 근거리 재고 5M − 초기 LP 2M | **3,000,000** |
-
-**배포 한도는 총량 비율이 아니라 풀 깊이 기준입니다** — 한 회차 배포의 명목가치가
-풀에 누적된 현금의 30%를 넘지 않습니다. 200만 개는 총량의 2% 안에 있으면서도
-$2,600짜리 풀을 부수기 때문입니다. ([DECISIONS.md](docs/DECISIONS.md) D-006)
-
-자세한 내용은 [`docs/TOKENOMICS.md`](docs/TOKENOMICS.md).
+숫자를 두 곳에 두면 언젠가 반드시 어긋나고, 어긋난 순간 이 프로젝트의 신뢰 자산이 사라집니다.
+그래서 여기에는 표를 두지 않습니다.
 
 ---
 
@@ -132,29 +116,20 @@ forge build
 forge test
 ```
 
-이미 서브모듈 없이 받았다면:
+이미 서브모듈 없이 받았다면 `git submodule update --init --recursive`.
 
-```bash
-git submodule update --init --recursive
-```
+**60개 테스트가 전부 통과해야 합니다.**
+(Token 15 / FounderVesting 13 / Inventory 13 / Deployment 19)
 
-**67개 테스트가 전부 통과해야 합니다.** (Token 15 / FounderVesting 13 / Inventory 17 / Timelock 12 / Allocation 10)
-
-| 라이브러리 | 고정 버전 |
-|---|---|
-| `forge-std` | v1.16.2 |
-| `openzeppelin-contracts` | **v5.4.0** |
-
-OpenZeppelin 버전은 함부로 올리지 마세요. `VestingWallet`의 해제 계산이나
+라이브러리는 `forge-std` v1.16.2, `openzeppelin-contracts` **v5.4.0**으로 고정돼 있습니다.
+OpenZeppelin 버전을 함부로 올리지 마세요 — `VestingWallet`의 해제 계산이나
 `TimelockController`의 역할 구조가 바뀌면 공지한 일정이 조용히 달라집니다.
-올릴 일이 생기면 67개 테스트를 먼저 돌리고, `docs/DECISIONS.md`에 이유를 남기세요.
 
 ### 배포 (테스트넷)
 
 ```bash
 cp .env.example .env
-# .env 를 열어 PRIVATE_KEY, BASESCAN_API_KEY 를 채웁니다
-# FOUNDER_ADDRESS 와 OPERATIONS_ADDRESS 도 배포 지갑과 분리하는 편이 좋습니다
+# .env 를 열어 PRIVATE_KEY, BASESCAN_API_KEY, OPERATOR_ADDRESS 를 채웁니다
 
 forge script script/Deploy.s.sol \
   --rpc-url base_sepolia \
@@ -162,8 +137,8 @@ forge script script/Deploy.s.sol \
   --verify
 ```
 
-한 번의 broadcast 안에서 토큰 배포 → 네 갈래 분할 → 잠금까지 끝납니다.
-「아직 안 잠긴」 상태가 존재하지 않습니다. ([DECISIONS.md](docs/DECISIONS.md) D-004)
+한 번의 broadcast 안에서 타임락 → 토큰 → 두 베스팅 → 물량 이체까지 끝납니다.
+「아직 안 잠긴」 상태가 존재하지 않습니다. (D-004)
 
 배포가 끝나면 출력된 **네 주소를 전부** [`docs/WALLETS.md`](docs/WALLETS.md)에 기록하고,
 Basescan에서 **소스 검증이 완료됐는지 반드시 확인**하세요.
@@ -174,9 +149,11 @@ Basescan에서 **소스 검증이 완료됐는지 반드시 확인**하세요.
 - [ ] 이름과 심볼을 확정했다 (**배포 후 변경 불가**)
 - [ ] 테스트넷에서 전체 흐름을 최소 한 번 완주했다
 - [ ] `docs/TOKENOMICS.md` 의 숫자가 `script/Deploy.s.sol` 의 상수와 일치한다
-      (`forge test --match-test ScriptConstantsMatchTokenomicsDocument` 가 통과한다)
-- [ ] 창업자 수령 주소와 운영 지갑이 배포 지갑과 분리돼 있다
-- [ ] 타임락에 외부 관리자가 없음을 확인했다 (`hasRole(DEFAULT_ADMIN_ROLE, 배포지갑) == false`)
+      (`forge test --match-test DeployScriptUsesTheSameNumbers` 가 통과한다)
+- [ ] 두 베스팅의 `owner()` 가 타임락 주소다 (D-015)
+- [ ] 타임락에 외부 admin이 없다 (`hasRole(DEFAULT_ADMIN_ROLE, 배포지갑) == false`)
+- [ ] 타임락 실행이 열려 있다 (`hasRole(EXECUTOR_ROLE, address(0)) == true`) — 키 분실 시 브릭 방지
+- [ ] `OPERATOR_ADDRESS` 가 배포 지갑과 분리돼 있다
 - [ ] 하드웨어 지갑을 쓴다 (`--ledger`)
 - [ ] 배포 직후 `docs/WALLETS.md` 를 갱신할 준비가 됐다
 - [ ] 0주차 기록을 쓸 준비가 됐다

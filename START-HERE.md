@@ -7,7 +7,7 @@
 
 ## 0. 지금 이 폴더에 들어 있는 것
 
-컨트랙트 2개, 테스트 **67개**, 배포 스크립트 1개, 문서 7개, 0주차 선언문 초안.
+컨트랙트 2개, 테스트 **60개**, 배포 스크립트 1개, 문서 7개, 0주차 선언문 초안.
 **컴파일과 테스트는 이미 통과한 상태**입니다. 배포 스크립트도 로컬에서 끝까지 돌려봤습니다.
 
 트레저리 4분할(창업자 베스팅 / 장기 재고 / 운영 타임락 / 근거리 재고)이
@@ -112,12 +112,11 @@ forge test
 ```
 Suite result: ok. 15 passed; 0 failed  (Token)
 Suite result: ok. 13 passed; 0 failed  (FounderVesting)
-Suite result: ok. 17 passed; 0 failed  (Inventory)
-Suite result: ok. 12 passed; 0 failed  (Timelock)
-Suite result: ok. 10 passed; 0 failed  (Allocation)
+Suite result: ok. 13 passed; 0 failed  (Inventory)
+Suite result: ok. 19 passed; 0 failed  (Deployment)
 ```
 
-**67개가 전부 통과해야 정상입니다.** 하나라도 실패하면 그 상태로 멈추고 알려주세요.
+**60개가 전부 통과해야 정상입니다.** 하나라도 실패하면 그 상태로 멈추고 알려주세요.
 
 ---
 
@@ -130,20 +129,22 @@ Suite result: ok. 10 passed; 0 failed  (Allocation)
 메타마스크에서 **새 계정**을 하나 만드세요.
 평소 쓰는 지갑을 쓰지 마세요. 이 키는 파일에 저장될 것이기 때문입니다.
 
-이번 배포에는 주소가 **셋** 필요합니다. 전부 같아도 동작하지만 나누는 편이 좋습니다.
+이번 배포에 필요한 주소는 **둘**입니다. 같아도 동작하지만 나누는 편이 좋습니다.
 
 | `.env` 항목 | 역할 | 비우면 |
 |---|---|---|
 | `PRIVATE_KEY` | 배포 지갑 = 트레저리. 근거리 재고 5,000,000을 들고 있게 됩니다 | 필수 |
-| `FOUNDER_ADDRESS` | 창업자 베스팅 수령인 | 배포 지갑 |
-| `OPERATIONS_ADDRESS` | 장기 재고 수령인 겸 타임락 제안·실행자 | 배포 지갑 |
+| `OPERATOR_ADDRESS` | 타임락에 **예약을 걸 수 있는** 주소 | 배포 지갑 |
+
+창업자 물량을 받을 주소는 따로 넣지 않습니다. **두 베스팅의 수령 주소가 타임락**이라
+해제분도 타임락으로 들어가고, 빼려면 7일 예약을 거치기 때문입니다. (D-015)
 
 ### (2) Base Sepolia 테스트 ETH 받기
 
 - https://www.alchemy.com/faucets/base-sepolia
 - 또는 https://docs.base.org/chain/network-faucets 에 있는 목록
 
-배포에 필요한 양은 **0.01 ETH도 안 됩니다.** (로컬 실측 가스 3,182,906 — 컨트랙트가
+배포에 필요한 양은 **0.01 ETH도 안 됩니다.** (로컬 실측 가스 3,182,788 — 컨트랙트가
 2개에서 4개로 늘면서 이전 1,256,692에서 증가했습니다)
 
 ### (3) Basescan API 키
@@ -192,7 +193,7 @@ Get-Content .env | ForEach-Object {
 forge script script/Deploy.s.sol --rpc-url base_sepolia --broadcast --verify
 ```
 
-끝나면 출력에 주소 **네 개**가 찍힙니다 — 토큰, 창업자 베스팅, 장기 재고, 운영 타임락.
+끝나면 출력에 주소 **네 개**가 찍힙니다 — 타임락, 토큰, 창업자 베스팅, 장기 재고.
 그 네 주소를 전부 `docs/WALLETS.md`에 적어두세요. **이게 DAXA 상장 심사 기준 ①(발행 주체 공개)의 시작점입니다.**
 
 Basescan에서 확인:
@@ -212,27 +213,31 @@ cast call <토큰주소> "totalSupply()(uint256)" --rpc-url base_sepolia
 # mint가 정말 없는가 (revert 나야 정상)
 cast call <토큰주소> "mint(address,uint256)" <내주소> 1 --rpc-url base_sepolia
 
-# 창업자 베스팅에 2천만 개가 잠겼는가
-cast call <토큰주소> "balanceOf(address)(uint256)" <창업자베스팅주소> --rpc-url base_sepolia
+# 잔고가 20M / 65M / 10M / 5M 인가
+cast call <토큰주소> "balanceOf(address)(uint256)" <창업자베스팅> --rpc-url base_sepolia
+cast call <토큰주소> "balanceOf(address)(uint256)" <장기재고>     --rpc-url base_sepolia
+cast call <토큰주소> "balanceOf(address)(uint256)" <타임락>       --rpc-url base_sepolia
+cast call <토큰주소> "balanceOf(address)(uint256)" <배포지갑>     --rpc-url base_sepolia
 
-# 지금 꺼낼 수 있는 양 (클리프 전이면 0)
-cast call <창업자베스팅주소> "releasable(address)(uint256)" <토큰주소> --rpc-url base_sepolia
+# ★ 두 베스팅의 수령 주소가 타임락인가 (D-015 — 여기가 틀리면 10년 뒤 88%입니다)
+cast call <창업자베스팅> "owner()(address)" --rpc-url base_sepolia
+cast call <장기재고>     "owner()(address)" --rpc-url base_sepolia
 
-# 장기 재고에 6천5백만 개가 잠겼는가
-cast call <토큰주소> "balanceOf(address)(uint256)" <장기재고주소> --rpc-url base_sepolia
+# 지금 꺼낼 수 있는 양 (창업자는 클리프 전이라 0, 재고는 2년 전이라 0)
+cast call <창업자베스팅> "releasable(address)(uint256)" <토큰주소> --rpc-url base_sepolia
+cast call <장기재고>     "releasable(address)(uint256)" <토큰주소> --rpc-url base_sepolia
 
-# 장기 재고 시작 시각 = 배포 시각 + 730일 이어야 합니다 (2년간 releasable 은 0)
-cast call <장기재고주소> "start()(uint256)" --rpc-url base_sepolia
-cast call <장기재고주소> "releasable(address)(uint256)" <토큰주소> --rpc-url base_sepolia
+# 장기 재고 시작 시각 = 배포 시각 + 730일 이어야 합니다
+cast call <장기재고> "start()(uint256)" --rpc-url base_sepolia
 
 # 타임락 지연이 7일(604800초)인가
-cast call <타임락주소> "getMinDelay()(uint256)" --rpc-url base_sepolia
+cast call <타임락> "getMinDelay()(uint256)" --rpc-url base_sepolia
 
-# 타임락에 외부 관리자가 없는가 (false 나야 정상)
-cast call <타임락주소> "hasRole(bytes32,address)(bool)"   0x0000000000000000000000000000000000000000000000000000000000000000   <배포지갑주소> --rpc-url base_sepolia
+# 외부 admin이 없는가 (false 나야 정상)
+cast call <타임락> "hasRole(bytes32,address)(bool)"   0x0000000000000000000000000000000000000000000000000000000000000000   <배포지갑> --rpc-url base_sepolia
 
-# 트레저리에 근거리 재고 5백만 개만 남았는가
-cast call <토큰주소> "balanceOf(address)(uint256)" <배포지갑주소> --rpc-url base_sepolia
+# 실행이 열려 있는가 (true 나야 정상 — 키를 잃어도 물량이 브릭되지 않습니다)
+cast call <타임락> "hasRole(bytes32,address)(bool)"   $(cast keccak "EXECUTOR_ROLE")   0x0000000000000000000000000000000000000000 --rpc-url base_sepolia
 ```
 
 ---
