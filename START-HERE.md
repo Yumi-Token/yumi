@@ -58,8 +58,17 @@ curl.exe -L -o foundry.zip https://github.com/foundry-rs/foundry/releases/downlo
 Expand-Archive foundry.zip -DestinationPath "$env:USERPROFILE\.foundry\bin"
 
 # PATH에 추가 (영구)
-[Environment]::SetEnvironmentVariable("Path", $env:Path + ";$env:USERPROFILE\.foundry\bin", "User")
+$p = [Environment]::GetEnvironmentVariable("Path", "User")
+if ($p -notlike "*\.foundry\bin*") { [Environment]::SetEnvironmentVariable("Path", "$p;$env:USERPROFILE\.foundry\bin", "User") }
 ```
+
+> ⚠️ 흔한 실수 두 개를 피하려고 이렇게 씁니다.
+>
+> `$env:Path`는 **시스템 PATH와 사용자 PATH를 합친 값**입니다.
+> 그걸 그대로 사용자 PATH에 쓰면 시스템 항목 전체가 사용자 쪽에 복사됩니다.
+> 그래서 `GetEnvironmentVariable(..., "User")`로 **사용자 쪽만** 읽습니다.
+>
+> 그리고 `-notlike` 검사가 있어서 **두 번 실행해도 중복으로 안 붙습니다.**
 
 새 PowerShell 창을 열고:
 
@@ -149,7 +158,11 @@ Suite result: ok. 19 passed; 0 failed  (Deployment)
 
 ### (3) Basescan API 키
 
-https://basescan.org 가입 → API Keys → 무료 키 발급.
+**https://etherscan.io** 가입 → API Keys → Add → 무료 키 발급.
+
+Etherscan 통합 API(V2)라 **키 하나가 Base 와 Base Sepolia 를 모두 커버합니다.**
+basescan.org 에서 따로 받지 않아도 됩니다. `foundry.toml` 이 chain id
+(테스트넷 84532 / 메인넷 8453)를 붙여 보냅니다.
 컨트랙트 소스 검증(verify)에 씁니다. 검증을 해야 사람들이 코드를 직접 읽을 수 있습니다.
 
 ---

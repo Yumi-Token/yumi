@@ -103,7 +103,7 @@ OpenZeppelin `VestingWalletCliff` 표준을 그대로 씁니다.
 - [Foundry](https://getfoundry.sh) — `curl -L https://foundry.paradigm.xyz | bash` 후 `foundryup`
 - 이 프로젝트 **전용** 지갑 (평소 쓰는 지갑 금지)
 - [Base Sepolia faucet](https://www.alchemy.com/faucets/base-sepolia) 테스트 ETH
-- [Basescan API 키](https://basescan.org/myapikey) (무료)
+- [Etherscan API 키](https://etherscan.io/myapikey) (무료) — 키 하나로 Base·Base Sepolia 둘 다 됩니다
 
 ### 설치
 
@@ -129,7 +129,7 @@ OpenZeppelin 버전을 함부로 올리지 마세요 — `VestingWallet`의 해�
 
 ```bash
 cp .env.example .env
-# .env 를 열어 PRIVATE_KEY, BASESCAN_API_KEY, OPERATOR_ADDRESS 를 채웁니다
+# .env 를 열어 PRIVATE_KEY, ETHERSCAN_API_KEY, OPERATOR_ADDRESS 를 채웁니다
 
 forge script script/Deploy.s.sol \
   --rpc-url base_sepolia \
