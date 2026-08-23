@@ -318,4 +318,6 @@ Solidity에서 한글이 들어간 문자열 리터럴은 `unicode"..."` 접두�
 - `docs/PRE-PUBLISH.md` — 발행 전 최종 점검 (8주 시계가 시작됩니다)
 - `docs/SECURITY.md` — 키와 서명 (컨트랙트 보안 아님)
 - `docs/DECISIONS.md` — 결정 기록 (새 결정은 여기에)
+- `PROMISE.md` — 약속 문서 (기록이 아님. 주차 번호 없음)
+- `docs/RECORD.md` — 매주 하는 해시 앵커링 절차
 - `log/` — 주간 기록
