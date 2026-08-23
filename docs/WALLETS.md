@@ -31,7 +31,7 @@
 | 장기 재고 베스팅 | 65,000,000 | 배포 +1년부터 3년 | [`0xbDD3f6586093d5ec287d902A2F01A681c8131189`](https://sepolia.basescan.org/address/0xbDD3f6586093d5ec287d902A2F01A681c8131189) |
 | 트레저리 = 근거리 재고 (배포 지갑) | 5,000,000 | 없음 | [`0x521ECcA9039c2502C4a5d1572D705F53723614d6`](https://sepolia.basescan.org/address/0x521ECcA9039c2502C4a5d1572D705F53723614d6) |
 | **Safe 2-of-3** (타임락 예약 권한) | — | — | [`0xeEE81a7865915a67f57651118426793d0BE986aA`](https://sepolia.basescan.org/address/0xeEE81a7865915a67f57651118426793d0BE986aA) |
-| 주간 기록 해시 지갑 | — | — | `미정` |
+| 주간 기록 해시 지갑 | — | — | [`0x1d97440D9B28D387ECB2ee32cfba6299dDA27453`](https://sepolia.basescan.org/address/0x1d97440D9B28D387ECB2ee32cfba6299dDA27453) |
 
 **두 베스팅의 수령 주소는 지갑이 아니라 위 타임락입니다.** (D-015)
 해제된 물량도 타임락으로 들어가므로, 어느 시점에도 발행자 지갑으로 직행하는 경로가 없습니다.
