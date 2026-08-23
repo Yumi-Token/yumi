@@ -169,7 +169,22 @@ Safe(`0xeEE81a78…86aA`), 소스 검증 4/4, D-007·D-015·D-019 전부 체인�
 - 두 베스팅의 `owner()` == 타임락 주소 (여기가 지갑이면 D-015가 무효입니다)
 - `hasRole(EXECUTOR_ROLE, address(0))` == true (키 분실 시 브릭 방지)
 
+### 종료 판정이 났을 때 (실행 순서)
+
+**한 번에 예약하세요.** `scheduleBatch`로 묶으면 7일 한 번으로 끝납니다.
+
+1. `founderVesting.transferOwnership(0x…dEaD)`
+2. `inventoryVesting.transferOwnership(0x…dEaD)`
+3. 타임락 보유 토큰 `burn()`
+4. LP 포지션 NFT를 소각 주소로 (⚠️ `decreaseLiquidity` 하지 말 것 — D-010)
+5. Safe 보유 토큰 `burn()` — 타임락 밖이라 별도
+
+**1·2번을 먼저 넣으세요.** 미해제 물량이 절대다수이고, 그것만이 되돌릴 수 없는 조치입니다.
+
 ### 4. `log/2026-W00.md` 발행 후 해시를 Base에 기록
+
+**발행 전에 [`PRE-PUBLISH.md`](PRE-PUBLISH.md)를 끝까지 지나가세요.**
+첫 기록의 해시가 체인에 올라가는 순간 D-009의 8주 시계가 시작되고 되돌릴 수 없습니다.
 
 **발행은 사람이 합니다.** 자동 발행하지 마세요.
 발행 전에 서두의 APYWA 숫자를 링크에서 다시 확인하세요.
