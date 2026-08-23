@@ -30,10 +30,22 @@
 
 ## 명령
 
+**⚠️ `sha256sum`은 PowerShell에 없습니다.** Git Bash나 WSL에만 있습니다.
+Windows PowerShell을 쓴다면 `Get-FileHash`를 쓰세요 — 아래 두 명령의 결과는 같습니다.
+
+```powershell
+# 2) 해시 — PowerShell
+(Get-FileHash log/2026-W34.md -Algorithm SHA256).Hash.ToLower()
+# 64c757...(64자)
+```
+
+`.ToLower()`가 필요한 이유는 `Get-FileHash`가 **대문자로** 출력하기 때문입니다.
+앵커 문자열은 소문자로 통일합니다 — 대소문자가 섞이면 남이 검증할 때 헷갈립니다.
+
 ```bash
-# 2) 해시
+# 2) 해시 — Git Bash / WSL
 sha256sum log/2026-W34.md
-# a3f2...(64자)
+# 64c757...(64자)
 
 # 3) 앵커 — 주간 해시 지갑에서 자기 자신에게 0원 전송, calldata에 해시
 cast send <해시지갑 주소> \
@@ -72,7 +84,7 @@ UTF-8로 넣기 때문에 **Basescan의 Input Data를 UTF-8로 보면 사람이 
 ## 남이 검증하는 방법
 
 ```bash
-# 파일을 받아서
+# 파일을 받아서 (PowerShell 은 Get-FileHash)
 sha256sum 2026-W34.md
 
 # 트랜잭션의 입력값을 읽어서
