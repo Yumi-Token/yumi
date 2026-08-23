@@ -16,7 +16,7 @@
 | 배포 스크립트 | ✅ 로컬 시뮬레이션 end-to-end 확인 |
 | 실측 스크립트 가스 | 3,182,788 |
 | 커스텀 코드 | **0줄** — 전부 OpenZeppelin 상속 또는 직접 사용 |
-| 테스트넷 배포 | ❌ 아직 |
+| 테스트넷 배포 | ✅ **2026-08-23 완료** — [`WALLETS.md`](WALLETS.md) 참조. 소스 검증 4/4 |
 
 `src/Token.sol`과 `src/FounderVesting.sol`은 **완성입니다. 건드리지 마세요.**
 
@@ -153,12 +153,12 @@ forge script script/Deploy.s.sol --account deployer --rpc-url base_sepolia --bro
 
 키를 다루기 때문에 **AI가 대신 할 수 없습니다.**
 
-### 1. 테스트넷 배포
+### 1. ~~테스트넷 배포~~ ✅ 2026-08-23 완료
 
-**Safe를 먼저 만드세요** (위 「Safe 2-of-3 만들기」). 그 다음 `START-HERE.md`의 4~7번.
+주소 네 개와 온체인 확인 결과는 [`WALLETS.md`](WALLETS.md)에 있습니다.
+Safe(`0xeEE81a78…86aA`), 소스 검증 4/4, D-007·D-015·D-019 전부 체인에서 확인했습니다.
 
-`.env`에 필요한 것은 셋입니다 — `PRIVATE_KEY`(또는 키스토어), `SAFE_ADDRESS`, `ETHERSCAN_API_KEY`.
-**`OPERATOR_ADDRESS`와 `FOUNDER_ADDRESS`는 더 이상 쓰지 않습니다.**
+**남은 것은 아래 4번(0주차 발행)입니다.**
 
 ### 2. 네 주소를 `docs/WALLETS.md`에 기입 → Basescan 검증 4건
 
