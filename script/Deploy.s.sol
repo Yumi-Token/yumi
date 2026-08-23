@@ -43,8 +43,10 @@ contract Deploy is Script {
     // ─── 배포 후 변경 불가 ──────────────────────────────────
     // 이름과 심볼은 영원히 바꿀 수 없습니다. 메인넷 전에 확정하세요.
 
-    string internal constant TOKEN_NAME = "Test Token";
-    string internal constant TOKEN_SYMBOL = "TEST";
+    // D-027 — 배포하면 영원히 바꿀 수 없습니다.
+    // 테스트넷에는 이미 "Test Token"/"TEST" 로 올라가 있고 그것은 리허설입니다.
+    string internal constant TOKEN_NAME = "Yumi";
+    string internal constant TOKEN_SYMBOL = "YUMI";
 
     // ─── 배분 (합이 정확히 INITIAL_SUPPLY여야 합니다) ────────
     //
