@@ -47,7 +47,7 @@
 | 1 | **범위** | 요청받은 것만 했는가. 커스텀 코드 0줄이 유지되는가. 컨트랙트에 기능이 늘지 않았는가 (D-001) |
 | 2 | **정합** | **(작업 전)** `git status`가 깨끗한가. **(작업 후)** `docs/TOKENOMICS.md` ↔ `script/Deploy.s.sol` ↔ `test/` ↔ `README.md` 4자가 한 방향인가. 숫자를 바꿨으면 `test/`를 `grep` 했는가 |
 | 3 | **불가역** | 배포 후 못 바꾸는 값을 건드렸는가 — 이름·심볼·decimals·총 발행량·베스팅 일정·장기 재고 `start`·타임락 지연 |
-| 4 | **안전선** | 키와 `.env`를 건드리지 않았는가. 사용자 대신 `--broadcast` 하지 않았는가. 수익·상장·날짜 약속 문구가 들어가지 않았는가 |
+| 4 | **안전선** | 키와 `.env`를 건드리지 않았는가. 사용자 대신 `--broadcast` 하지 않았는가. 수익·상장·날짜 약속 문구가 들어가지 않았는가. **`lib/`·서브모듈이 바뀌지 않았는가** (`git submodule status`에 `+`가 없어야 합니다 — `docs/SECURITY.md`) |
 | 5 | **검증** | 실제로 돌린 명령과 그 출력. `forge build` / `forge test` / `forge fmt --check` |
 | 6 | **기록** | 남이 확인할 수 있는 항목이 남았는가. 판단은 `docs/DECISIONS.md`에 D-0NN으로, 실패는 `log/` 거리로 |
 
@@ -316,7 +316,7 @@ Solidity에서 한글이 들어간 문자열 리터럴은 `unicode"..."` 접두�
 - `docs/WALLETS.md` — 공개 지갑 주소
 - `docs/UTILITY.md` — 유틸리티를 붙일 조건 (지금은 안 붙입니다)
 - `docs/PRE-PUBLISH.md` — 발행 전 최종 점검 (8주 시계가 시작됩니다)
-- `docs/SECURITY.md` — 키와 서명 (컨트랙트 보안 아님)
+- `docs/SECURITY.md` — 키와 서명, 의존성 위변조 확인 (컨트랙트 보안 아님)
 - `docs/DECISIONS.md` — 결정 기록 (새 결정은 여기에)
 - `PROMISE.md` — 약속 문서 (기록이 아님. 주차 번호 없음)
 - `docs/RECORD.md` — 매주 하는 해시 앵커링 절차
