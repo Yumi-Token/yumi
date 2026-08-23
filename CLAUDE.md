@@ -339,6 +339,8 @@ Solidity에서 한글이 들어간 문자열 리터럴은 `unicode"..."` 접두�
 - `docs/WALLETS.md` — 공개 지갑 주소
 - `docs/UTILITY.md` — 유틸리티를 붙일 조건 (지금은 안 붙입니다)
 - `docs/PRE-PUBLISH.md` — 발행 전 최종 점검 (8주 시계가 시작됩니다)
+- `docs/CHANNELS.md` — 채널 게시물 원본 (실제 채널과 달라지면 어긋난 상태)
+- `docs/CHANNELS-FAQ.md` — 자주 오는 질문의 준비된 답
 - `assets/` — 로고 (tight 크롭이 공식)
 - `docs/SECURITY.md` — 키와 서명, 의존성 위변조 확인 (컨트랙트 보안 아님)
 - `docs/DECISIONS.md` — 결정 기록 (새 결정은 여기에)
