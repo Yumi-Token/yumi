@@ -45,8 +45,10 @@ contract Deploy is Script {
 
     // D-027 — 배포하면 영원히 바꿀 수 없습니다.
     // 테스트넷에는 이미 "Test Token"/"TEST" 로 올라가 있고 그것은 리허설입니다.
-    string internal constant TOKEN_NAME = "Yumi";
-    string internal constant TOKEN_SYMBOL = "YUMI";
+    // public 인 이유는 배분 상수와 같습니다 — test/Deployment.t.sol 이
+    // 실제 배포되는 값을 직접 읽어야 자리표시자로 되돌아간 것이 잡힙니다.
+    string public constant TOKEN_NAME = "Yumi";
+    string public constant TOKEN_SYMBOL = "YUMI";
 
     // ─── 배분 (합이 정확히 INITIAL_SUPPLY여야 합니다) ────────
     //

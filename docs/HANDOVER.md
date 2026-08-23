@@ -12,7 +12,7 @@
 | | |
 |---|---|
 | 컴파일 | ✅ solc 0.8.28 (forge 1.5.1) |
-| 테스트 | ✅ **63개 통과** (Token 15 / FounderVesting 13 / Inventory 13 / Deployment 22) |
+| 테스트 | ✅ **64개 통과** (Token 15 / FounderVesting 13 / Inventory 13 / Deployment 23) |
 | 배포 스크립트 | ✅ 로컬 시뮬레이션 end-to-end 확인 |
 | 실측 스크립트 가스 | 3,182,788 |
 | 커스텀 코드 | **0줄** — 전부 OpenZeppelin 상속 또는 직접 사용 |

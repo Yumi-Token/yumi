@@ -23,7 +23,7 @@
 
 | 항목 | 상태 |
 |---|---|
-| 컨트랙트 | 작성 완료, 테스트 63개 통과 |
+| 컨트랙트 | 작성 완료, 테스트 64개 통과 |
 | 테스트넷 배포 | ✅ 2026-08-23 (Base Sepolia) |
 | 메인넷 배포 | 아직 |
 | 이름·심볼 | **Yumi / YUMI** (D-027) — 메인넷 배포 전까지 코드에만 있습니다 |
@@ -126,8 +126,8 @@ forge test
 
 이미 서브모듈 없이 받았다면 `git submodule update --init --recursive`.
 
-**63개 테스트가 전부 통과해야 합니다.**
-(Token 15 / FounderVesting 13 / Inventory 13 / Deployment 22)
+**64개 테스트가 전부 통과해야 합니다.**
+(Token 15 / FounderVesting 13 / Inventory 13 / Deployment 23)
 
 라이브러리는 `forge-std` v1.16.2, `openzeppelin-contracts` **v5.4.0**으로 고정돼 있습니다.
 OpenZeppelin 버전을 함부로 올리지 마세요 — `VestingWallet`의 해제 계산이나

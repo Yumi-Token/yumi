@@ -57,7 +57,7 @@ contract DeploymentTest is Test {
         executors[0] = address(0);
 
         timelock = new TimelockController(MIN_DELAY, proposers, executors, address(0));
-        token = new Token("Test Token", "TEST", deployer);
+        token = new Token(unicode"Yumi", unicode"YUMI", deployer);
         founderVesting = new FounderVesting(address(timelock), deployedAt, FOUNDER_DURATION, CLIFF);
         inventoryVesting =
             new VestingWallet(address(timelock), deployedAt + INVENTORY_START_DELAY, INVENTORY_DURATION);
@@ -93,6 +93,29 @@ contract DeploymentTest is Test {
         assertEq(script.INVENTORY_START_DELAY(), INVENTORY_START_DELAY, unicode"재고 시작 +365일");
         assertEq(script.INVENTORY_DURATION(), INVENTORY_DURATION, unicode"재고 해제 1095일");
         assertEq(script.TIMELOCK_MIN_DELAY(), MIN_DELAY, unicode"타임락 7일");
+    }
+
+    /**
+     * @notice 이름과 심볼이 자리표시자가 아닌지 고정합니다.
+     *
+     * 배포하면 영원히 못 바꾸는 값인데 개발 중에는 "Test Token"으로 두기 쉽습니다.
+     * 이 테스트가 실패하면 누군가 되돌린 것입니다. (D-027)
+     */
+    function test_TokenNameAndSymbolAreFinal() public {
+        Deploy script = new Deploy();
+
+        // 배포 스크립트의 값
+        assertEq(script.TOKEN_NAME(), unicode"Yumi", unicode"배포 스크립트의 이름");
+        assertEq(script.TOKEN_SYMBOL(), unicode"YUMI", unicode"배포 스크립트의 심볼");
+
+        // 이 테스트가 재현한 배포도 같은 값이어야 합니다
+        assertEq(token.name(), script.TOKEN_NAME(), unicode"재현 배포와 스크립트가 어긋남");
+        assertEq(token.symbol(), script.TOKEN_SYMBOL(), unicode"재현 배포와 스크립트가 어긋남");
+
+        assertTrue(
+            keccak256(bytes(script.TOKEN_NAME())) != keccak256(bytes("Test Token")),
+            unicode"자리표시자로 되돌아갔습니다"
+        );
     }
 
     // ─── 배분 불변식 ────────────────────────────────────────

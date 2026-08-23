@@ -236,6 +236,10 @@ Uniswap 호출에는 짧은 `deadline`(예약+9일 정도)을 함께 거세요.
 숫자를 바꿨으면 `test/`에서 그 숫자를 `grep` 하세요.
 
 숫자의 단일 출처는 `TOKENOMICS.md`이고, 다른 문서는 링크만 겁니다.
+
+**채널도 문서입니다.** `docs/CHANNELS.md`를 고쳤는데 실제 쓰레드·디스코드가 그대로면
+그것도 어긋난 상태입니다. 반대도 마찬가지입니다.
+숫자를 바꿨으면 **채널에 올라간 글에도 그 숫자가 있는지** 확인하라고 사용자에게 알리세요.
 `test/Deployment.t.sol`의 `test_DeployScriptUsesTheSameNumbers`가
 Deploy 상수와 테스트 숫자를 묶어두지만, **문서까지 묶어주지는 않습니다.**
 
@@ -262,7 +266,7 @@ Deploy 상수와 테스트 숫자를 묶어두지만, **문서까지 묶어주�
 
 ```bash
 forge build          # 컴파일
-forge test           # 테스트 (63개 통과해야 정상)
+forge test           # 테스트 (64개 통과해야 정상)
 forge test -vvv      # 실패 시 상세 출력
 forge fmt            # 포맷
 forge test --gas-report
@@ -316,6 +320,7 @@ Solidity에서 한글이 들어간 문자열 리터럴은 `unicode"..."` 접두�
 - `docs/WALLETS.md` — 공개 지갑 주소
 - `docs/UTILITY.md` — 유틸리티를 붙일 조건 (지금은 안 붙입니다)
 - `docs/PRE-PUBLISH.md` — 발행 전 최종 점검 (8주 시계가 시작됩니다)
+- `assets/` — 로고 (tight 크롭이 공식)
 - `docs/SECURITY.md` — 키와 서명, 의존성 위변조 확인 (컨트랙트 보안 아님)
 - `docs/DECISIONS.md` — 결정 기록 (새 결정은 여기에)
 - `PROMISE.md` — 약속 문서 (기록이 아님. 주차 번호 없음)

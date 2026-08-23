@@ -7,7 +7,7 @@
 
 ## 0. 지금 이 폴더에 들어 있는 것
 
-컨트랙트 2개, 테스트 **63개**, 배포 스크립트 1개, 문서 7개, 0주차 선언문 초안.
+컨트랙트 2개, 테스트 **64개**, 배포 스크립트 1개, 문서 7개, 0주차 선언문 초안.
 **컴파일과 테스트는 이미 통과한 상태**입니다. 배포 스크립트도 로컬에서 끝까지 돌려봤습니다.
 
 트레저리 4분할(창업자 베스팅 / 장기 재고 / 운영 타임락 / 근거리 재고)이
@@ -122,10 +122,10 @@ forge test
 Suite result: ok. 15 passed; 0 failed  (Token)
 Suite result: ok. 13 passed; 0 failed  (FounderVesting)
 Suite result: ok. 13 passed; 0 failed  (Inventory)
-Suite result: ok. 22 passed; 0 failed  (Deployment)
+Suite result: ok. 23 passed; 0 failed  (Deployment)
 ```
 
-**63개가 전부 통과해야 정상입니다.** 하나라도 실패하면 그 상태로 멈추고 알려주세요.
+**64개가 전부 통과해야 정상입니다.** 하나라도 실패하면 그 상태로 멈추고 알려주세요.
 
 ---
 
