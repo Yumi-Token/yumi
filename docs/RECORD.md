@@ -79,6 +79,16 @@ UTF-8로 넣기 때문에 **Basescan의 Input Data를 UTF-8로 보면 사람이 
 **⚠️ 반드시 테스트넷에서 한 번 성공시킨 뒤에 하세요.** `cast`의 raw calldata 전달
 방식은 버전에 따라 다를 수 있습니다. 실패하는 절차를 8주 동안 반복할 수는 없습니다.
 
+**PowerShell에서는 `$(...)` 치환이 bash와 다릅니다.** 두 줄로 나누세요.
+
+```powershell
+$data = cast from-utf8 "LOG 2026-W34.md sha256:64c757..."
+cast send <해시지갑 주소> $data --value 0 --account weekly --rpc-url base
+```
+
+**실측 (2026-08-23 테스트넷 리허설)** — 가스 24,480, 소요 시간 3분.
+키스토어 등록은 처음 한 번뿐이라 다음 주부터는 2단계입니다.
+
 ---
 
 ## 남이 검증하는 방법
@@ -87,8 +97,8 @@ UTF-8로 넣기 때문에 **Basescan의 Input Data를 UTF-8로 보면 사람이 
 # 파일을 받아서 (PowerShell 은 Get-FileHash)
 sha256sum 2026-W34.md
 
-# 트랜잭션의 입력값을 읽어서
-cast tx <TXHASH> input --rpc-url base | cast to-utf8
+# 트랜잭션의 입력값을 읽어서 (0x 를 떼고 넘겨야 합니다)
+cast to-utf8 $(cast tx <TXHASH> input --rpc-url base | sed 's/^0x//')
 
 # 두 해시가 같은지 본다. 시각은 그 트랜잭션의 블록 타임스탬프다.
 ```
