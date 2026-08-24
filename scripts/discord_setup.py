@@ -93,6 +93,38 @@ CHANNELS = [
     },
 ]
 
+# ─── 역할 ────────────────────────────────────────────────
+# 역할은 둘뿐이고, 둘 다 **신원 표시**가 목적입니다.
+#
+# 누가 DM으로 "운영자입니다"라고 해도 멤버 목록에 역할이 없으면 바로 들통납니다.
+# 「공식 주소는 저장소 한 곳에만」과 같은 원리 — 진짜인지 한 곳에서만 확인되게 합니다.
+#
+# 보유량 등급(🐋/🦐)을 여기 추가하지 마세요.
+# 등급표가 곧 「더 사라」는 신호가 되고, 누가 큰 홀더인지 공개되어
+# 그 사람이 피싱 표적이 됩니다. #잡담에 지갑 주소를 못 쓰게 막아놓고
+# 잔액 등급을 멤버 목록에 띄우면 앞뒤가 맞지 않습니다. (D-028)
+
+ADMINISTRATOR = 1 << 3
+MANAGE_MESSAGES = 1 << 13
+MANAGE_THREADS = 1 << 34
+MODERATE_MEMBERS = 1 << 40  # 타임아웃
+
+ROLES = [
+    {
+        "name": "발행자",
+        "color": 0xE07A5F,
+        "permissions": ADMINISTRATOR,
+        "note": "사용자 본인. 한 명뿐입니다",
+    },
+    {
+        "name": "운영진",
+        "color": 0x81B29A,
+        # 추방·차단은 넣지 않습니다. 되돌리기 어려운 것은 발행자가 합니다.
+        "permissions": MANAGE_MESSAGES | MANAGE_THREADS | MODERATE_MEMBERS,
+        "note": "지금은 0명. 자리만 만들어 둡니다",
+    },
+]
+
 MSG_START = [
     f"""# 여기가 무엇인지
 
@@ -258,8 +290,35 @@ def main():
     print(f"서버 : {g.get('name')}  (id {guild})")
     print(f"모드 : {'적용' if apply else '미리보기 — 아무것도 바꾸지 않습니다'}\n")
 
-    existing = {c["name"]: c for c in api("GET", f"/guilds/{guild}/channels", token)}
     everyone = guild  # @everyone 역할 id 는 길드 id 와 같습니다
+
+    # ─ 역할 ─
+    have_roles = {r["name"]: r for r in api("GET", f"/guilds/{guild}/roles", token)}
+    for spec in ROLES:
+        name = spec["name"]
+        if name in have_roles:
+            print(f"  = @{name} 이미 있음")
+            continue
+        if not apply:
+            print(f"  + @{name} 생성 예정 — {spec['note']}")
+            continue
+        api(
+            "POST",
+            f"/guilds/{guild}/roles",
+            token,
+            {
+                "name": name,
+                "color": spec["color"],
+                "permissions": str(spec["permissions"]),
+                "hoist": True,  # 멤버 목록 상단에 따로 표시
+                "mentionable": False,  # 멘션 스팸 방지
+            },
+        )
+        print(f"  + @{name} 생성됨")
+    print()
+
+    # ─ 채널 ─
+    existing = {c["name"]: c for c in api("GET", f"/guilds/{guild}/channels", token)}
 
     made = {}
     for spec in CHANNELS:
