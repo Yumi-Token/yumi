@@ -187,6 +187,10 @@ MSG_START = [
 · **상장 얘기** — 계획도 예정도 말하지 않습니다
 · **날짜가 박힌 로드맵** — 지키지 못한 계획은 나중에 불리한 기록이 됩니다
 
+**다만 확정된 사실은 알립니다.** 정해지지 않은 것을 정해진 것처럼 말하지 않겠다는 뜻이지,
+이미 일어난 일을 숨기겠다는 뜻이 아닙니다. 홀더가 알아야 할 일이 확정되면 그대로 알립니다.
+숨기는 것도 정직하지 않습니다.
+
 가격 얘기를 하시는 분을 막지는 않지만 **제가 답하지는 않습니다.**
 그리고 수익을 약속하는 글은 지웁니다 — 제가 쓴 게 아니어도요.
 
@@ -238,19 +242,22 @@ read all of it without holding anything, and that will not change.
 **There is one promise, and only one: I will not stop.**
 
 If eight consecutive weeks pass with no verifiable record, the project ends.
-No exceptions. I don't get to decide whether that happened — every week the
-record's SHA-256 hash goes on-chain, and if the last transaction is more than
-eight weeks old, anyone can see it is over.
+No exceptions, and I don't get to be the judge — each week the record's SHA-256
+hash goes on-chain. If the last one is over eight weeks old, it is over.
 
-**The 7-day timelock is not a lock. It is an alarm.**
-It does not stop things from moving. It makes sure a noise happens first.
+**The 7-day timelock is not a lock. It is an alarm.** It does not stop things
+from moving; it makes sure a noise happens first.
 
 ## Not discussed here
 
 · **Price** — how high, when to buy. Not here.
-· **Returns** — no yield, no principal, no "N×". Those words are not used.
+· **Returns** — no yield, no principal, no "N×".
 · **Exchange listings** — no plans, no predictions.
 · **Roadmaps with dates** — a missed plan becomes evidence against you later.
+
+**Settled facts are still announced.** The rule is that I won't state undecided
+things as if they were decided — not that I'll hide what already happened.
+Hiding it would be its own kind of dishonesty.
 
 You are not stopped from talking about price. **I just won't answer.**
 Posts promising returns get removed — including mine.
@@ -390,7 +397,29 @@ AUTOMOD = [
 ]
 
 
+MAX_LEN = 2000  # 디스코드 메시지 길이 제한
+
+
+def check_lengths():
+    """문안이 길이 제한을 넘으면 서버에 손대기 전에 멈춥니다.
+
+    영문본을 붙이다가 실제로 넘겨서 PATCH 가 HTTP 400 으로 죽었습니다.
+    적용 도중에 죽으면 일부만 반영된 상태로 남습니다.
+    """
+    bad = [
+        (m.splitlines()[0][:40], len(m))
+        for group in (MSG_START, MSG_START_EN, MSG_LOG, MSG_LOG_EN)
+        for m in group
+        if len(m) > MAX_LEN
+    ]
+    if bad:
+        lines = [f"  {h} — {n}자 ({n - MAX_LEN}자 초과)" for h, n in bad]
+        nl = chr(10)
+        raise SystemExit(nl + f"문안이 {MAX_LEN}자 제한을 넘습니다:" + nl + nl.join(lines) + nl)
+
+
 def main():
+    check_lengths()
     apply = "--apply" in sys.argv
     env = load_env()
     token = env.get("DISCORD_BOT_TOKEN") or os.environ.get("DISCORD_BOT_TOKEN", "")
@@ -498,20 +527,37 @@ def main():
         if isinstance(pinned, dict):  # API 버전에 따라 리스트 또는 {"items": [...]}
             pinned = pinned.get("items", [])
         # 고정 목록의 항목은 메시지이거나 {"message": {...}} 입니다
-        have = [(x.get("message") or x).get("content", "") for x in (pinned or [])]
+        have = [(x.get("message") or x) for x in (pinned or [])]
 
         for body in messages:
             head = body.splitlines()[0].strip()  # 첫 줄로 같은 글인지 판별
-            if any(h.lstrip().startswith(head) for h in have):
+            old = next(
+                (m for m in have if m.get("content", "").lstrip().startswith(head)), None
+            )
+            if old is None:
+                if not apply:
+                    print(f"  + #{chan_name} 「{head[:28]}」 게시·고정 예정 ({len(body)}자)")
+                    continue
+                m = api("POST", f"/channels/{ch['id']}/messages", token, {"content": body})
+                api("PUT", f"/channels/{ch['id']}/pins/{m['id']}", token)
+                print(f"  + #{chan_name} 「{head[:28]}」 게시·고정 ({len(body)}자)")
+                time.sleep(0.6)
+            elif old.get("content", "").strip() != body.strip():
+                # 문안을 고쳤는데 올라간 글이 그대로면 그것도 어긋난 상태입니다.
+                # 다시 올리면 고정이 둘로 늘고 순서가 뒤집히므로 원래 글을 고칩니다.
+                if not apply:
+                    print(f"  ~ #{chan_name} 「{head[:28]}」 본문 갱신 예정")
+                    continue
+                api(
+                    "PATCH",
+                    f"/channels/{ch['id']}/messages/{old['id']}",
+                    token,
+                    {"content": body},
+                )
+                print(f"  ~ #{chan_name} 「{head[:28]}」 본문 갱신됨 ({len(body)}자)")
+                time.sleep(0.6)
+            else:
                 print(f"  = #{chan_name} 「{head[:28]}」 이미 있음")
-                continue
-            if not apply:
-                print(f"  + #{chan_name} 「{head[:28]}」 게시·고정 예정 ({len(body)}자)")
-                continue
-            m = api("POST", f"/channels/{ch['id']}/messages", token, {"content": body})
-            api("PUT", f"/channels/{ch['id']}/pins/{m['id']}", token)
-            print(f"  + #{chan_name} 「{head[:28]}」 게시·고정 ({len(body)}자)")
-            time.sleep(0.6)
 
     post_and_pin("시작하기", MSG_START)
     post_and_pin("시작하기", MSG_START_EN)
@@ -574,7 +620,7 @@ def main():
     )
     print("손으로 해야 하는 것 (API 로 안 되거나 권한이 필요합니다):")
     print("  - 서버 아이콘 : assets/yumi-logo-256.png")
-    print("  - 규칙 동의 화면 : 서버 설정 → 커뮤니티 활성화 후 「규칙 심사」")
+    print("  - 규칙 동의 화면 : 서버 설정 → 「멤버십 심사」. 문안은 docs/CHANNELS.md 2-0-5")
     print("  - DM 스팸 필터 : 서버 설정 → 안전 설정 → 최고")
     print("  - 초대 링크 : 저장소를 Public 으로 바꾼 뒤에 만드세요\n")
 

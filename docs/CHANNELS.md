@@ -184,6 +184,33 @@ python scripts/discord_setup.py --apply  # 실제 적용
 
 ---
 
+## 2-0-5. 규칙 동의 화면 — 문안
+
+**손으로 넣어야 합니다.** 서버 설정 → 「멤버십 심사」.
+**봇 차단에 실제로 기여하는 것은 이것입니다** — 사기 봇 상당수가 여기서 걸립니다.
+
+```
+1. 가격·수익·상장 얘기는 하지 않습니다. 단, 확정된 사실만 얘기합니다
+   No price, returns, or listing talk — only facts that are already settled.
+
+2. 공식 주소는 저장소 한 곳에만 있습니다. DM으로 받은 주소는 전부 사칭입니다
+   The official address lives only in the repository.
+   Any address sent by DM is a scam.
+
+3. 개인키·시드 문구를 묻는 사람은 전부 사기입니다
+   Anyone asking for your private key or seed phrase is a scammer.
+```
+
+**1번 뒤쪽 절반이 중요합니다.** 앞쪽만 있으면 「상장을 확정하고도 안 알리는 것」이
+규칙이 되어 버립니다. 그건 다른 종류의 거짓말입니다.
+`CLAUDE.md` 의 확정 사실 / 약속 구분과 같은 선이고,
+`#시작하기` 고정 메시지 3번(과 영문본)에도 같은 문장이 들어가 있습니다.
+**한쪽만 고치면 어긋납니다.**
+
+「습격 보호」도 같은 안전 설정 안에 있습니다. 함께 켜세요.
+
+---
+
 ## 2-0-1. 채널을 늘리지 않는 이유
 
 전형적인 코인 디스코드는 채널이 15개고 대부분 죽어 있습니다.
