@@ -93,6 +93,26 @@ CHANNELS = [
     },
 ]
 
+# ─── 서버 보안 설정 ──────────────────────────────────────
+# 크립토 서버에 오는 사기 봇은 대부분 「막 만든 계정」입니다.
+# 가입 후 일정 시간을 요구하는 것만으로 상당수가 걸러집니다.
+#
+# 여기 없는 것 두 가지는 API 로 안 됩니다 — 아래 「손으로」 안내에 있습니다.
+#   · 2단계 인증 요구 (mfa_level) — 서버 소유자만 바꿀 수 있습니다
+#   · 커뮤니티 활성화 · 규칙 동의 화면
+
+GUILD_SETTINGS = {
+    # 3 = 높음: 서버에 가입하고 10분이 지나야 글을 쓸 수 있습니다.
+    #     4(전화 인증)는 정상 이용자도 많이 막혀 쓰지 않습니다.
+    "verification_level": 3,
+    # 2 = 모든 멤버의 미디어를 검사합니다. 역할 유무로 봐주지 않습니다.
+    "explicit_content_filter": 2,
+    # 1 = 멘션만 알림. 기본값(모든 메시지)이면 사람들이 알림 때문에 나갑니다.
+    "default_message_notifications": 1,
+}
+
+LEVEL_NAME = {0: "없음", 1: "낮음", 2: "보통", 3: "높음", 4: "매우 높음"}
+
 # ─── 역할 ────────────────────────────────────────────────
 # 역할은 둘뿐이고, 둘 다 **신원 표시**가 목적입니다.
 #
@@ -291,6 +311,19 @@ def main():
     print(f"모드 : {'적용' if apply else '미리보기 — 아무것도 바꾸지 않습니다'}\n")
 
     everyone = guild  # @everyone 역할 id 는 길드 id 와 같습니다
+
+    # ─ 서버 보안 설정 ─
+    diff = {k: v for k, v in GUILD_SETTINGS.items() if g.get(k) != v}
+    for k, v in GUILD_SETTINGS.items():
+        now = g.get(k)
+        if now == v:
+            print(f"  = {k} 이미 {v}")
+        else:
+            print(f"  {'+' if apply else '+'} {k}  {now} → {v}")
+    if diff and apply:
+        api("PATCH", f"/guilds/{guild}", token, diff)
+        print("  + 서버 설정 적용됨")
+    print()
 
     # ─ 역할 ─
     have_roles = {r["name"]: r for r in api("GET", f"/guilds/{guild}/roles", token)}
