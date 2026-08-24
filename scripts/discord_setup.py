@@ -282,13 +282,22 @@ def main():
     def post_and_pin(chan_name, messages):
         ch = made.get(chan_name)
         if not ch:
+            # 미리보기라 채널이 아직 없는 경우
+            print(f"  + #{chan_name} 생성 후 메시지 {len(messages)}개 게시·고정 예정")
+            return
+
+        # 미리보기에서도 실제 상태를 조회합니다.
+        # 안 그러면 이미 게시됐는데 「예정」이라고 찍혀 잘못 읽게 됩니다.
+        pinned = api("GET", f"/channels/{ch['id']}/pins", token)
+        # 디스코드 API 버전에 따라 리스트 또는 {"items": [...]} 로 옵니다
+        if isinstance(pinned, dict):
+            pinned = pinned.get("items", [])
+        n_pinned = len(pinned or [])
+        if n_pinned:
+            print(f"  = #{chan_name} 고정 메시지 {n_pinned}개 이미 있음 — 건너뜀")
             return
         if not apply:
             print(f"  + #{chan_name} 에 메시지 {len(messages)}개 게시·고정 예정")
-            return
-        pinned = api("GET", f"/channels/{ch['id']}/pins", token)
-        if pinned:
-            print(f"  = #{chan_name} 이미 고정 메시지가 있음 — 건너뜀")
             return
         for body in messages:
             m = api("POST", f"/channels/{ch['id']}/messages", token, {"content": body})
