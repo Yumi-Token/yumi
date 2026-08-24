@@ -78,17 +78,17 @@ SEND_MESSAGES = 1 << 11  # 메시지 보내기 권한 비트
 CHANNELS = [
     {
         "name": "시작하기",
-        "topic": "여기가 무엇인지. 먼저 읽어주세요. (읽기 전용)",
+        "topic": "여기가 무엇인지. 먼저 읽어주세요. (읽기 전용) · Start here — read the pinned messages first. Read-only.",
         "readonly": True,
     },
     {
         "name": "기록",
-        "topic": "주간 기록. 발행 순서대로 쌓입니다. 여기서는 대화하지 않습니다 → #잡담",
+        "topic": "주간 기록. 발행 순서대로 쌓입니다. 여기서는 대화하지 않습니다 → #잡담 · Weekly records, in order. Read-only — discussion goes to #잡담.",
         "readonly": True,
     },
     {
         "name": "잡담",
-        "topic": "아무거나. 다만 가격·수익·상장 얘기는 답하지 않습니다 → #시작하기",
+        "topic": "아무거나. 다만 가격·수익·상장 얘기는 답하지 않습니다 → #시작하기 · Anything goes, but price / returns / listing questions will not be answered.",
         "readonly": False,
     },
 ]
@@ -220,12 +220,112 @@ MSG_START = [
 · 주간 기록 → {GH}/tree/main/log""",
 ]
 
+# 영문 병기.
+# 번역이 아니라 **같은 내용을 영어로 다시 쓴 것**입니다 — 한글본이 원본이고,
+# 둘이 어긋나면 그것도 「공지와 코드가 다른」 상태입니다.
+#
+# 영어가 봇을 막지는 않습니다. 막는 것은 자동조정과 인증 수준입니다.
+# 다만 영어권 방문자가 규칙을 못 읽어서 어기는 경우를 없애고,
+# 사기 경고를 못 읽는 사람이 없게 합니다. 크립토 서버 방문자의 상당수가 영어권입니다.
+
+MSG_START_EN = [
+    f"""# What this is  ·  English
+
+One person building a token in public, with a **verifiable record every week.**
+The record is the point; the token comes second. **The record is free** — you can
+read all of it without holding anything, and that will not change.
+
+**There is one promise, and only one: I will not stop.**
+
+If eight consecutive weeks pass with no verifiable record, the project ends.
+No exceptions. I don't get to decide whether that happened — every week the
+record's SHA-256 hash goes on-chain, and if the last transaction is more than
+eight weeks old, anyone can see it is over.
+
+**The 7-day timelock is not a lock. It is an alarm.**
+It does not stop things from moving. It makes sure a noise happens first.
+
+## Not discussed here
+
+· **Price** — how high, when to buy. Not here.
+· **Returns** — no yield, no principal, no "N×". Those words are not used.
+· **Exchange listings** — no plans, no predictions.
+· **Roadmaps with dates** — a missed plan becomes evidence against you later.
+
+You are not stopped from talking about price. **I just won't answer.**
+Posts promising returns get removed — including mine.
+
+## Discussed here instead
+
+· What I did this week, and **what failed**
+· Wrong math, bad docs, decisions I reversed
+· Numbers and addresses — **things you can check yourself**
+
+**Failure records are the most valuable thing here.** Success stories can be
+invented; specific failures have to be lived.
+
+## Links
+
+· The promise, and what is not promised → {GH}/blob/main/PROMISE.md
+· Allocation and reasoning → {GH}/blob/main/docs/TOKENOMICS.md
+· Decision log → {GH}/blob/main/docs/DECISIONS.md
+· Every address → {GH}/blob/main/docs/WALLETS.md
+· Weekly records → {GH}/tree/main/log""",
+    f"""## ⚠️ Read this before anything else
+
+**1) There is no mainnet token yet.**
+What exists today is a **testnet (Base Sepolia) contract** with no value at all.
+Every address is public → {GH}/blob/main/docs/WALLETS.md
+
+If anyone hands you an address for "Yumi", **it is a scam.** When a mainnet token
+exists, it goes here and in the repository at the same time. Until then, no
+address is official.
+
+**2) A ticker is not an identity. The contract address is.**
+`YUMI` already exists on other chains. Anyone can deploy a token with any symbol,
+and no registry exists to prevent it.
+**The official address lives in exactly one place — the repository.**
+Never trust an address from a DM, a search result, or any other site.
+
+**3) There is no presale, and no private sale. No exceptions.**
+If you want to buy and don't know how, **I am glad to explain how.**
+I will not take your money and send you tokens.
+
+**4) I will never need access to your wallet.**
+Anyone asking for your seed phrase, private key, or password is **a scammer —
+including if they are pretending to be me.** I will never ask, and neither will
+any bot in this server.""",
+]
+
+MSG_LOG_EN = [
+    f"""*(English)* No record has been published yet. When the first one goes up,
+the link and its anchoring transaction appear here together.
+
+Anchor list → {GH}/blob/main/log/ANCHORS.md"""
+]
+
 MSG_LOG = [
     f"""아직 발행된 기록이 없습니다.
 첫 기록이 올라가면 여기에 링크와 앵커 트랜잭션이 함께 올라옵니다.
 
 앵커 목록 → {GH}/blob/main/log/ANCHORS.md"""
 ]
+
+# ─── 커뮤니티 활성화 ─────────────────────────────────────
+# 켜면 「멤버십 심사」(규칙에 동의해야 참여) 와 습격 보호를 쓸 수 있습니다.
+# 사기 봇 상당수가 규칙 동의 화면에서 걸립니다.
+#
+# 디스코드가 채널 두 개를 요구합니다 — 규칙 채널과 운영 알림 채널.
+# 규칙 채널은 #시작하기 를 그대로 씁니다.
+# 운영 알림 채널은 디스코드가 공지를 보내는 곳이라 새로 만들어야 하지만,
+# @everyone 에게서 숨겨두므로 방문자에게 보이는 채널은 여전히 셋뿐입니다.
+
+VIEW_CHANNEL = 1 << 10
+
+MOD_CHANNEL = {
+    "name": "운영-알림",
+    "topic": "디스코드가 서버 운영자에게 보내는 공지. 멤버에게는 보이지 않습니다.",
+}
 
 # ─── 자동조정 ─────────────────────────────────────────────
 # 크립토 서버에는 사기 봇이 반드시 옵니다. 손으로 막을 수 없습니다.
@@ -357,8 +457,17 @@ def main():
     for spec in CHANNELS:
         name = spec["name"]
         if name in existing:
-            print(f"  = #{name} 이미 있음")
-            made[name] = existing[name]
+            cur = existing[name]
+            made[name] = cur
+            if cur.get("topic") != spec["topic"]:
+                # 문안을 고쳤는데 서버가 그대로면 그것도 어긋난 상태입니다
+                if apply:
+                    api("PATCH", f"/channels/{cur['id']}", token, {"topic": spec["topic"]})
+                    print(f"  ~ #{name} 설명 갱신됨")
+                else:
+                    print(f"  ~ #{name} 설명 갱신 예정")
+            else:
+                print(f"  = #{name} 이미 있음")
             continue
         if not apply:
             print(f"  + #{name} 생성 예정 (읽기전용={spec['readonly']})")
@@ -372,33 +481,42 @@ def main():
         print(f"  + #{name} 생성됨")
 
     def post_and_pin(chan_name, messages):
+        """메시지 단위로 판단합니다.
+
+        예전에는 「고정이 하나라도 있으면 전부 건너뜀」이었는데,
+        그러면 문안을 하나 추가했을 때 영영 올라가지 않습니다.
+        실제로 영문본을 추가하면서 그 문제가 드러났습니다.
+        """
         ch = made.get(chan_name)
         if not ch:
-            # 미리보기라 채널이 아직 없는 경우
             print(f"  + #{chan_name} 생성 후 메시지 {len(messages)}개 게시·고정 예정")
             return
 
         # 미리보기에서도 실제 상태를 조회합니다.
         # 안 그러면 이미 게시됐는데 「예정」이라고 찍혀 잘못 읽게 됩니다.
         pinned = api("GET", f"/channels/{ch['id']}/pins", token)
-        # 디스코드 API 버전에 따라 리스트 또는 {"items": [...]} 로 옵니다
-        if isinstance(pinned, dict):
+        if isinstance(pinned, dict):  # API 버전에 따라 리스트 또는 {"items": [...]}
             pinned = pinned.get("items", [])
-        n_pinned = len(pinned or [])
-        if n_pinned:
-            print(f"  = #{chan_name} 고정 메시지 {n_pinned}개 이미 있음 — 건너뜀")
-            return
-        if not apply:
-            print(f"  + #{chan_name} 에 메시지 {len(messages)}개 게시·고정 예정")
-            return
+        # 고정 목록의 항목은 메시지이거나 {"message": {...}} 입니다
+        have = [(x.get("message") or x).get("content", "") for x in (pinned or [])]
+
         for body in messages:
+            head = body.splitlines()[0].strip()  # 첫 줄로 같은 글인지 판별
+            if any(h.lstrip().startswith(head) for h in have):
+                print(f"  = #{chan_name} 「{head[:28]}」 이미 있음")
+                continue
+            if not apply:
+                print(f"  + #{chan_name} 「{head[:28]}」 게시·고정 예정 ({len(body)}자)")
+                continue
             m = api("POST", f"/channels/{ch['id']}/messages", token, {"content": body})
             api("PUT", f"/channels/{ch['id']}/pins/{m['id']}", token)
-            print(f"  + #{chan_name} 메시지 게시·고정 ({len(body)}자)")
+            print(f"  + #{chan_name} 「{head[:28]}」 게시·고정 ({len(body)}자)")
             time.sleep(0.6)
 
     post_and_pin("시작하기", MSG_START)
+    post_and_pin("시작하기", MSG_START_EN)
     post_and_pin("기록", MSG_LOG)
+    post_and_pin("기록", MSG_LOG_EN)
 
     have = {r["name"] for r in api("GET", f"/guilds/{guild}/auto-moderation/rules", token)}
     for rule in AUTOMOD:
@@ -410,6 +528,44 @@ def main():
             continue
         api("POST", f"/guilds/{guild}/auto-moderation/rules", token, rule)
         print(f"  + 자동조정 「{rule['name']}」 생성됨")
+
+    # ─ 커뮤니티 활성화 ─
+    print()
+    feats = list(g.get("features", []))
+    if "COMMUNITY" in feats:
+        print("  = 커뮤니티 이미 켜짐")
+    elif not apply:
+        print(f"  + #{MOD_CHANNEL['name']} 생성 예정 (멤버에게 숨김)")
+        print("  + 커뮤니티 활성화 예정 — 규칙 채널 #시작하기")
+    else:
+        chans = api("GET", f"/guilds/{guild}/channels", token)
+        mod = next((c for c in chans if c["name"] == MOD_CHANNEL["name"]), None)
+        if not mod:
+            mod = api(
+                "POST",
+                f"/guilds/{guild}/channels",
+                token,
+                {
+                    "name": MOD_CHANNEL["name"],
+                    "type": 0,
+                    "topic": MOD_CHANNEL["topic"],
+                    "permission_overwrites": [
+                        {"id": everyone, "type": 0, "deny": str(VIEW_CHANNEL)}
+                    ],
+                },
+            )
+            print(f"  + #{MOD_CHANNEL['name']} 생성됨 (멤버에게 숨김)")
+        api(
+            "PATCH",
+            f"/guilds/{guild}",
+            token,
+            {
+                "features": feats + ["COMMUNITY"],
+                "rules_channel_id": made["시작하기"]["id"],
+                "public_updates_channel_id": mod["id"],
+            },
+        )
+        print("  + 커뮤니티 활성화됨 — 규칙 채널 #시작하기")
 
     print(
         "\n완료.\n"
