@@ -30,3 +30,7 @@ node_modules/
 # Cowork 세션에서 넘어온 프롬프트. 결정과 근거는 docs/DECISIONS.md 에
 # 남으므로 여기 원본까지 커밋할 이유가 없습니다.
 Claude/
+# ─── 채널 운영 스크립트 (저장소 산출물이 아님) ──────────────
+# 홀더·검증과 무관하고 서버 구조만 노출합니다.
+scripts/discord_setup.py
+scripts/__pycache__/
