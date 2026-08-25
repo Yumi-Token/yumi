@@ -64,6 +64,8 @@
 - [ ] `README.md`의 영문 요약이 한국어 본문과 어긋나지 않는가
 - [ ] **`PROMISE.md`가 한 화면을 넘지 않는가** (D-032)
 - [ ] `PROMISE.md`에서 뺀 내용이 **전부 2층 어딘가에 실제로 있는가** — 하나라도 없으면 분실
+- [ ] `scripts/weekly.conf`의 주소가 `docs/WALLETS.md`와 일치하는가
+      — 메인넷 배포 후 `NETWORK`·`RPC_URL`·`EXPLORER`를 바꿨는지 특히 확인
 
 ## 3-1. ⚠️ 공개 순서 — LP 계획
 
