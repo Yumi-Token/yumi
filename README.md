@@ -5,6 +5,22 @@
 
 ---
 
+## In short (English)
+
+A one-person project building a token in public. One promise: **don't stop.**
+
+If eight consecutive weeks pass without a verifiable record, it ends — judged by the
+timestamp of the last on-chain hash, not by me. Every record carries at least one thing
+anyone can check independently: a commit, a transaction, an address, a number.
+
+No yield, no listings, no dated roadmap. **Records are free and always will be** —
+you don't need the token to read them.
+
+The token is named after my cat. Full documents are in Korean:
+[PROMISE.md](PROMISE.md) · [TOKENOMICS.md](docs/TOKENOMICS.md) · [DECISIONS.md](docs/DECISIONS.md)
+
+---
+
 ## 이게 뭔가요
 
 한국 코인은 대부분 멈춰서 죽습니다. 국내 프로젝트 93개를 전수 평가한 결과
