@@ -88,7 +88,7 @@ CHANNELS = [
     },
     {
         "name": "잡담",
-        "topic": "아무거나. 다만 가격·수익·상장 얘기는 답하지 않습니다 → #시작하기 · Anything goes, but price / returns / listing questions will not be answered.",
+        "topic": "아무거나. 다만 가격·수익 얘기는 답하지 않습니다 → #시작하기 · Anything goes, but price and returns questions will not be answered.",
         "readonly": False,
     },
 ]
@@ -184,8 +184,8 @@ MSG_START = [
 
 · **가격 얘기** — 얼마까지 오를지, 언제 사야 할지는 여기서 다루지 않습니다
 · **수익 약속** — 수익률·원금·「N배」 같은 말은 쓰지 않습니다
-· **상장 얘기** — 계획도 예정도 말하지 않습니다
 · **날짜가 박힌 로드맵** — 지키지 못한 계획은 나중에 불리한 기록이 됩니다
+· **정해지지 않은 것을 정해진 것처럼 말하는 것** — 무엇에 대해서든
 
 **다만 확정된 사실은 알립니다.** 정해지지 않은 것을 정해진 것처럼 말하지 않겠다는 뜻이지,
 이미 일어난 일을 숨기겠다는 뜻이 아닙니다. 홀더가 알아야 할 일이 확정되면 그대로 알립니다.
@@ -252,8 +252,8 @@ from moving; it makes sure a noise happens first.
 
 · **Price** — how high, when to buy. Not here.
 · **Returns** — no yield, no principal, no "N×".
-· **Exchange listings** — no plans, no predictions.
 · **Roadmaps with dates** — a missed plan becomes evidence against you later.
+· **Anything undecided, stated as if it were decided.**
 
 **Settled facts are still announced.** The rule is that I won't state undecided
 things as if they were decided — not that I'll hide what already happened.

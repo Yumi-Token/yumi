@@ -111,7 +111,7 @@ Base Sepolia (테스트넷) · 0xd26B05b6…b53F
 「유미 코인」이라며 주소를 건네는 사람이 있으면 전부 사칭이다.
 공개된 주소는 전부 테스트넷(Base Sepolia)이고 아무 가치가 없다.
 
-수익률, 상장, 날짜 박힌 계획은 말하지 않는다.
+수익률과 날짜 박힌 계획은 말하지 않는다.
 기록은 무료다. 토큰이 없어도 전부 볼 수 있다.
 
 전체 → https://github.com/Yumi-Token/yumi
@@ -195,8 +195,8 @@ python scripts/discord_setup.py --apply  # 실제 적용
 **봇 차단에 실제로 기여하는 것은 이것입니다** — 사기 봇 상당수가 여기서 걸립니다.
 
 ```
-1. 가격·수익·상장 얘기는 하지 않습니다. 단, 확정된 사실만 얘기합니다
-   No price, returns, or listing talk — only facts that are already settled.
+1. 가격·수익 얘기는 하지 않습니다. 정해진 사실만 얘기합니다
+   No price or returns talk. Only what is already settled gets stated.
 
 2. 공식 주소는 저장소 한 곳에만 있습니다. DM으로 받은 주소는 전부 사칭입니다
    The official address lives only in the repository.
@@ -206,7 +206,7 @@ python scripts/discord_setup.py --apply  # 실제 적용
    Anyone asking for your private key or seed phrase is a scammer.
 ```
 
-**1번 뒤쪽 절반이 중요합니다.** 앞쪽만 있으면 「상장을 확정하고도 안 알리는 것」이
+**1번 뒤쪽 절반이 중요합니다.** 앞쪽만 있으면 「정해지고도 안 알리는 것」이
 규칙이 되어 버립니다. 그건 다른 종류의 거짓말입니다.
 `CLAUDE.md` 의 확정 사실 / 약속 구분과 같은 선이고,
 `#시작하기` 고정 메시지 3번(과 영문본)에도 같은 문장이 들어가 있습니다.
@@ -349,8 +349,8 @@ python scripts/discord_setup.py --apply  # 실제 적용
 
 · **가격 얘기** — 얼마까지 오를지, 언제 사야 할지는 여기서 다루지 않습니다
 · **수익 약속** — 수익률·원금·「N배」 같은 말은 쓰지 않습니다
-· **상장 얘기** — 계획도 예정도 말하지 않습니다
 · **날짜가 박힌 로드맵** — 지키지 못한 계획은 나중에 불리한 기록이 됩니다
+· **정해지지 않은 것을 정해진 것처럼 말하는 것** — 무엇에 대해서든
 
 가격 얘기를 하시는 분을 막지는 않지만 **제가 답하지는 않습니다.**
 그리고 수익을 약속하는 글은 지웁니다 — 제가 쓴 게 아니어도요.
@@ -438,7 +438,7 @@ python scripts/discord_setup.py --apply  # 실제 적용
 ## 2-4. `#잡담` 채널 설명
 
 ```
-아무거나. 다만 가격·수익·상장 얘기는 답하지 않습니다 → #시작하기
+아무거나. 다만 가격·수익 얘기는 답하지 않습니다 → #시작하기
 ```
 
 ---

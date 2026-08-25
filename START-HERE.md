@@ -207,7 +207,7 @@ forge script script/Deploy.s.sol --rpc-url base_sepolia --broadcast --verify
 ```
 
 끝나면 출력에 주소 **네 개**가 찍힙니다 — 타임락, 토큰, 창업자 베스팅, 장기 재고.
-그 네 주소를 전부 `docs/WALLETS.md`에 적어두세요. **이게 DAXA 상장 심사 기준 ①(발행 주체 공개)의 시작점입니다.**
+그 네 주소를 전부 `docs/WALLETS.md`에 적어두세요. **발행 주체가 누구이고 어떤 지갑이 무엇을 쥐고 있는지를 처음부터 공개하는 것**이 이 프로젝트의 출발점입니다.
 
 Basescan에서 확인:
 

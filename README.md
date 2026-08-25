@@ -13,7 +13,7 @@ If eight consecutive weeks pass without a verifiable record, it ends — judged 
 timestamp of the last on-chain hash, not by me. Every record carries at least one thing
 anyone can check independently: a commit, a transaction, an address, a number.
 
-No yield, no listings, no dated roadmap. **Records are free and always will be** —
+No yield, no dated roadmap, nothing stated as settled before it is. **Records are free and always will be** —
 you don't need the token to read them.
 
 The token is named after my cat. Full documents are in Korean:
@@ -26,7 +26,7 @@ The token is named after my cat. Full documents are in Korean:
 한국 코인은 대부분 멈춰서 죽습니다. 국내 프로젝트 93개를 전수 평가한 결과
 우수 등급은 단 2개였고 71개가 C 이하였는데, 지목된 주요 원인이 **개발 활동 중단**이었습니다.
 
-그래서 이 프로젝트는 기술도, 수익도, 상장도 약속하지 않습니다.
+그래서 이 프로젝트는 기술도, 수익도 약속하지 않습니다.
 **단 하나만 약속하고, 그것이 지켜지는지는 매주 누구나 확인할 수 있습니다.**
 
 - **기록은 무료입니다.** 토큰이 없어도 전부 볼 수 있고, 앞으로도 그렇습니다.
