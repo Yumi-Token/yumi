@@ -9,9 +9,14 @@
 | | |
 |---|---|
 | 저장소 | https://github.com/Yumi-Token/yumi |
+| **쓰레드** | https://www.threads.com/@yumitoken |
+| **디스코드** | https://discord.gg/M9S8Xf6zm2 |
 | 핸들 | `yumitoken` (쓰레드·디스코드 공통) |
 | 표시 이름 | 유미 기록 |
 | 로고 | `assets/yumi-logo-256.png` |
+
+> **디스코드 초대는 만료 없음 · 사용 횟수 무제한**이고 `#시작하기`로 떨어집니다.
+> 만료가 있으면 문서에 적힌 링크가 어느 날 조용히 죽습니다.
 
 자주 오는 질문의 준비된 답은 [`CHANNELS-FAQ.md`](CHANNELS-FAQ.md)에 있습니다.
 
@@ -115,6 +120,7 @@ Base Sepolia (테스트넷) · 0xd26B05b6…b53F
 기록은 무료다. 토큰이 없어도 전부 볼 수 있다.
 
 전체 → https://github.com/Yumi-Token/yumi
+디스코드 → https://discord.gg/M9S8Xf6zm2
 ```
 
 > **문체를 「~다」로 통일했습니다.** 기록 본문과 같은 목소리입니다.
