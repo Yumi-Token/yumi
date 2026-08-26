@@ -1,0 +1,17 @@
+{
+  "name": "Yumi",
+  "timestamp": "2026-08-27T00:00:00.000Z",
+  "version": { "major": 1, "minor": 0, "patch": 0 },
+  "logoURI": "https://raw.githubusercontent.com/Yumi-Token/yumi/main/assets/yumi-logo-256.png",
+  "keywords": ["yumi", "base"],
+  "tokens": [
+    {
+      "chainId": 8453,
+      "address": "0xbDD3f6586093d5ec287d902A2F01A681c8131189",
+      "name": "Yumi",
+      "symbol": "YUMI",
+      "decimals": 18,
+      "logoURI": "https://raw.githubusercontent.com/Yumi-Token/yumi/main/assets/yumi-logo-256.png"
+    }
+  ]
+}
