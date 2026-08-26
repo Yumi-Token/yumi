@@ -296,12 +296,19 @@ do_anchor() {
     # 경로에 역슬래시가 있으면 sha256sum 이 줄 앞에 \ 를 붙여 이스케이프하고,
     # 그걸 그대로 잘라 쓰면 해시가 「\<hash>」가 됩니다. 실제로 그렇게 나왔습니다.
     hash="$(sha256sum < "$file" | cut -d' ' -f1)"
-    data="$(cast from-utf8 "LOG $(basename "$file") sha256:$hash")"
+    # 저장소 주소를 함께 싣습니다. 앵커를 체인에서 먼저 본 사람이
+    # 이 한 줄만으로 원본을 찾을 수 있어야 합니다 (D-034).
+    # 「LOG 」로 시작하는 조건은 그대로이므로 판정에는 영향이 없습니다.
+    local label
+    label="LOG $(basename "$file") sha256:$hash"
+    [ -n "${REPO:-}" ] && label="$label repo:$REPO"
+    data="$(cast from-utf8 "$label")"
 
     cat <<EOF
 
 ────────────────────────────────────────────
 sha256  $hash
+실릴 문자열  $label
 
 아래를 붙여넣어 직접 실행하세요. 이 스크립트는 실행하지 않습니다.
 
