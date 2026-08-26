@@ -41,9 +41,19 @@ The token is named after my cat. Full documents are in Korean:
 |---|---|
 | 컨트랙트 | 작성 완료, 테스트 64개 통과 |
 | 테스트넷 배포 | ✅ 2026-08-23 (Base Sepolia) |
-| 메인넷 배포 | 아직 |
-| 이름·심볼 | **Yumi / YUMI** (D-027) — 메인넷 배포 전까지 코드에만 있습니다 |
-| 유동성 | 없음 (계획상 한참 뒤) |
+| **메인넷 배포** | ✅ **2026-08-27 (Base)** |
+| 이름·심볼 | **Yumi / YUMI** (D-027) — 배포됐으므로 이제 변경 불가 |
+| **유동성** | ✅ **4,000,000 을 5구간에.** 포지션 NFT 는 전부 타임락 |
+| 기록 | #1 발행 · 앵커 2026-08-26 15:48 UTC |
+
+**공식 주소 — 이 둘이 아니면 우리 것이 아닙니다.**
+
+```
+토큰  0xbDD3f6586093d5ec287d902A2F01A681c8131189
+풀    0xaC130b30C9Bf0a337FDB8259344C2d7b571B4E3d
+```
+
+전체 목록 → [`docs/WALLETS.md`](docs/WALLETS.md) · 사는 방법 → [`docs/HOW-TO-BUY.md`](docs/HOW-TO-BUY.md)
 
 ---
 
@@ -168,7 +178,9 @@ forge script script/Deploy.s.sol \
 Basescan에서 **소스 검증이 완료됐는지 반드시 확인**하세요.
 검증되지 않은 컨트랙트는 아무도 신뢰하지 않습니다.
 
-### 메인넷 배포 전 체크리스트
+### ~~메인넷 배포 전 체크리스트~~ ✅ 2026-08-27 전부 통과
+
+온체인 확인 결과는 [`docs/WALLETS.md`](docs/WALLETS.md) 에 있습니다.
 
 - [ ] 이름과 심볼을 확정했다 (**배포 후 변경 불가**)
 - [ ] 테스트넷에서 전체 흐름을 최소 한 번 완주했다
@@ -213,6 +225,7 @@ Basescan에서 **소스 검증이 완료됐는지 반드시 확인**하세요.
 - [`docs/TOKENOMICS.md`](docs/TOKENOMICS.md) — 배분과 근거
 - [`docs/WALLETS.md`](docs/WALLETS.md) — 공개 지갑 주소
 - [`docs/UTILITY.md`](docs/UTILITY.md) — 왜 지금은 아무 기능도 안 붙이는가
+- [`docs/HOW-TO-BUY.md`](docs/HOW-TO-BUY.md) — 사는 방법 (권유가 아닙니다. 안 사도 기록은 무료입니다)
 - [`docs/DECISIONS.md`](docs/DECISIONS.md) — 결정 기록
 - [`PROMISE.md`](PROMISE.md) — 이 프로젝트가 하는 약속과 하지 않는 약속
 - [`log/`](log/) — 주간 기록
