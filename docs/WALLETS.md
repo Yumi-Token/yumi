@@ -64,20 +64,47 @@
 
 | 역할 | 보유량 | 잠금 | 주소 |
 |---|---|---|---|
-| 토큰 컨트랙트 | — | — | `미배포` |
-| 운영 타임락 | 10,000,000 | 7일 예약 | `미배포` |
-| 창업자 베스팅 | 20,000,000 | 3개월 클리프 + 12개월 | `미배포` |
-| 장기 재고 베스팅 | 65,000,000 | 배포 +1년부터 3년 | `미배포` |
-| 트레저리 = 근거리 재고 | 5,000,000 | 없음 | `미배포` |
-| **Safe 2-of-3** (타임락 예약 권한) | — | — | `미배포` |
+| 토큰 컨트랙트 | — | — | [`0xbDD3f6586093d5ec287d902A2F01A681c8131189`](https://basescan.org/token/0xbDD3f6586093d5ec287d902A2F01A681c8131189) |
+| 운영 타임락 | 10,000,000 | 7일 예약 | [`0x22FB76084160482488a3C8d752a963e4F36594A9`](https://basescan.org/address/0x22FB76084160482488a3C8d752a963e4F36594A9) |
+| 창업자 베스팅 | 20,000,000 | 3개월 클리프 + 12개월 | [`0x2bdC70Acbf26162B2bFd300eB2826542EFf4e0bE`](https://basescan.org/address/0x2bdC70Acbf26162B2bFd300eB2826542EFf4e0bE) |
+| 장기 재고 베스팅 | 65,000,000 | 배포 +1년부터 3년 | [`0xe4981c703bA99fC7f8F2db5C8c3096a877c8E13c`](https://basescan.org/address/0xe4981c703bA99fC7f8F2db5C8c3096a877c8E13c) |
+| 트레저리 = 근거리 재고 | 5,000,000 | 없음 | [`0x521ECcA9039c2502C4a5d1572D705F53723614d6`](https://basescan.org/address/0x521ECcA9039c2502C4a5d1572D705F53723614d6) |
+| **Safe 2-of-3** (타임락 예약 권한) | — | — | [`0x7acFA2c49965b5E37a311Ff927FfCCef52a1Fe93`](https://basescan.org/address/0x7acFA2c49965b5E37a311Ff927FfCCef52a1Fe93) |
 | 주간 기록 해시 지갑 | — | — | [`0x1d97440D9B28D387ECB2ee32cfba6299dDA27453`](https://basescan.org/address/0x1d97440D9B28D387ECB2ee32cfba6299dDA27453) |
-| LP 포지션 NFT | — | 타임락 보관 | `미정` |
+| LP 포지션 NFT ×5 | 4,000,000 상당 | **타임락 보관** | [`#5883905`](https://basescan.org/nft/0x03a520b32C04BF3bEEf7BEb72E919cf822Ed34f1/5883905) [`#5883912`](https://basescan.org/nft/0x03a520b32C04BF3bEEf7BEb72E919cf822Ed34f1/5883912) [`#5883918`](https://basescan.org/nft/0x03a520b32C04BF3bEEf7BEb72E919cf822Ed34f1/5883918) [`#5883919`](https://basescan.org/nft/0x03a520b32C04BF3bEEf7BEb72E919cf822Ed34f1/5883919) [`#5883974`](https://basescan.org/nft/0x03a520b32C04BF3bEEf7BEb72E919cf822Ed34f1/5883974) |
+| **풀 (Uniswap v3, 1%)** | — | — | [`0xaC130b30C9Bf0a337FDB8259344C2d7b571B4E3d`](https://basescan.org/address/0xaC130b30C9Bf0a337FDB8259344C2d7b571B4E3d) |
 
-> LP 투입 후 배포 지갑 잔고는 **0**이 되고, 남은 **1,000,000은 Safe**로 옮깁니다. (D-019)
+> **2026-08-27 완료.** 배포 지갑 잔고는 **0**이고(반올림 잔여 0.0000000000124 제외),
+> 남은 **1,000,000은 Safe**에 있습니다. (D-019)
 > **Safe는 타임락이 아니므로 이 1M은 7일 예고 대상이 아닙니다.**
 > 「예고 없이 움직일 수 있는 양 1%」가 이것입니다.
+>
+> 🔴 **포지션 NFT 5개는 전부 타임락에 있습니다.** 그래서 수수료 수령(`collect`)과
+> 판매 대금 회수(`decreaseLiquidity`)가 **둘 다 Safe 예약 → 7일 대기**를 거칩니다.
+> 배포 지갑에 뒀다면 「7일 전에 보인다」가 거짓이 됐을 자리입니다. (D-014)
 
 **두 베스팅의 수령 주소는 지갑이 아니라 위 타임락입니다.** (D-015)
+
+배포일: **2026-08-27** · 트랜잭션 7건 합계 **3,545,076 gas**
+첫 트랜잭션: [`0x16f1d3ce…`](https://basescan.org/tx/0x16f1d3ce76bc62c768443501c9eae8c3d196116a8aa2e1d70f0676f8cf1755b6)
+
+### 배포 직후 온체인 확인 결과 (2026-08-27 · Base 메인넷)
+
+| 확인 | 결과 |
+|---|---|
+| 이름·심볼·decimals | `Yumi` / `YUMI` / 18 |
+| 잔고 20M / 65M / 10M / 5M | ✅ 합 100,000,000 |
+| `mint` 함수 | ✅ 없음 (revert) |
+| 두 베스팅 `owner()` == 타임락 | ✅ (D-015) |
+| `hasRole(PROPOSER, Safe)` | ✅ true (D-019) |
+| `hasRole(PROPOSER, 배포지갑)` | ✅ false (D-007) |
+| `hasRole(CANCELLER, 배포지갑)` | ✅ false |
+| `hasRole(EXECUTOR, address(0))` | ✅ true — 키 분실 브릭 방지 |
+| `hasRole(DEFAULT_ADMIN, 배포지갑)` | ✅ false |
+| `getMinDelay()` | ✅ 604800 (7일) |
+| 창업자 클리프 | 2026-11-24 |
+| 장기 재고 시작 | 2027-08-26 (배포 +1년) |
+| 현재 해제 가능량 | ✅ 창업자 0 / 재고 0 |
 
 ### 이름·심볼 선점 선언
 
