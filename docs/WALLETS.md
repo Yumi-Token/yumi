@@ -90,10 +90,29 @@
 |---|---|
 | 내용 | `CLAIM Yumi/YUMI repo:github.com/Yumi-Token/yumi` |
 | 보낸 주소 | [`0x1d97440D…`](https://basescan.org/address/0x1d97440D9B28D387ECB2ee32cfba6299dDA27453) |
-| 트랜잭션 | `미실행` |
-| 블록 시각 | `미실행` |
+| 받는 주소 | 같은 주소 (자기 자신) |
+| **트랜잭션** | [`0x7c7ae8a5…a6e6`](https://basescan.org/tx/0x7c7ae8a5668af840dbc559b5af246cc773737901e07e971b4adb7e353c17a6e6) |
+| 블록 | 50482641 |
+| **블록 시각** | **2026-08-26 14:30:29 UTC** |
+| 가스 | 22,880 |
+
+**이것이 해시 지갑의 Base 메인넷 첫 트랜잭션입니다.** 이 시각 이후에 같은 이름으로
+배포된 토큰은 이 선언보다 늦습니다.
 
 **이 트랜잭션은 종료 판정에 들어가지 않습니다.** `LOG `로 시작하지 않기 때문입니다. (D-034)
+
+> **같은 내용이 한 번 더 나갔습니다** — [`0x13c29577…620c`](https://basescan.org/tx/0x13c2957773f1ece58a25a93cb2da80b22819c05230d1f8d3e0f9debd3c11620c)
+> (nonce 1, 14:42:07 UTC). 첫 시도가 실패한 줄 알고 다시 보낸 것인데 둘 다 성공했습니다.
+> **기준은 이른 쪽(nonce 0)입니다.** 늦은 것을 지울 방법은 없고, 지울 이유도 없습니다 —
+> 내용이 같고 둘 다 `CLAIM `으로 시작해 판정과 무관합니다.
+> **없던 일로 하지 않고 적어둡니다.**
+
+**직접 확인하는 방법** — Input Data를 UTF-8로 보면 사람이 그대로 읽습니다.
+
+```bash
+cast to-utf8 $(cast tx 0x7c7ae8a5668af840dbc559b5af246cc773737901e07e971b4adb7e353c17a6e6 input --rpc-url https://mainnet.base.org | sed 's/^0x//')
+# CLAIM Yumi/YUMI repo:github.com/Yumi-Token/yumi
+```
 
 ### 테스트넷에서 그대로 쓰는 것 / 새로 만드는 것
 
