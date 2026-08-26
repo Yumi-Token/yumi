@@ -68,7 +68,7 @@
 | 운영 타임락 | 10,000,000 | 7일 예약 | [`0x22FB76084160482488a3C8d752a963e4F36594A9`](https://basescan.org/address/0x22FB76084160482488a3C8d752a963e4F36594A9) |
 | 창업자 베스팅 | 20,000,000 | 3개월 클리프 + 12개월 | [`0x2bdC70Acbf26162B2bFd300eB2826542EFf4e0bE`](https://basescan.org/address/0x2bdC70Acbf26162B2bFd300eB2826542EFf4e0bE) |
 | 장기 재고 베스팅 | 65,000,000 | 배포 +1년부터 3년 | [`0xe4981c703bA99fC7f8F2db5C8c3096a877c8E13c`](https://basescan.org/address/0xe4981c703bA99fC7f8F2db5C8c3096a877c8E13c) |
-| 트레저리 = 근거리 재고 | 5,000,000 | 없음 | [`0x521ECcA9039c2502C4a5d1572D705F53723614d6`](https://basescan.org/address/0x521ECcA9039c2502C4a5d1572D705F53723614d6) |
+| ~~트레저리 = 배포 지갑~~ | **0** | — | [`0x521ECcA9039c2502C4a5d1572D705F53723614d6`](https://basescan.org/address/0x521ECcA9039c2502C4a5d1572D705F53723614d6) — **비웠습니다** |
 | **Safe 2-of-3** (타임락 예약 권한) | — | — | [`0x7acFA2c49965b5E37a311Ff927FfCCef52a1Fe93`](https://basescan.org/address/0x7acFA2c49965b5E37a311Ff927FfCCef52a1Fe93) |
 | 주간 기록 해시 지갑 | — | — | [`0x1d97440D9B28D387ECB2ee32cfba6299dDA27453`](https://basescan.org/address/0x1d97440D9B28D387ECB2ee32cfba6299dDA27453) |
 | LP 포지션 NFT ×5 | 4,000,000 상당 | **타임락 보관** | [`#5883905`](https://basescan.org/nft/0x03a520b32C04BF3bEEf7BEb72E919cf822Ed34f1/5883905) [`#5883912`](https://basescan.org/nft/0x03a520b32C04BF3bEEf7BEb72E919cf822Ed34f1/5883912) [`#5883918`](https://basescan.org/nft/0x03a520b32C04BF3bEEf7BEb72E919cf822Ed34f1/5883918) [`#5883919`](https://basescan.org/nft/0x03a520b32C04BF3bEEf7BEb72E919cf822Ed34f1/5883919) [`#5883974`](https://basescan.org/nft/0x03a520b32C04BF3bEEf7BEb72E919cf822Ed34f1/5883974) |
@@ -82,6 +82,25 @@
 > 🔴 **포지션 NFT 5개는 전부 타임락에 있습니다.** 그래서 수수료 수령(`collect`)과
 > 판매 대금 회수(`decreaseLiquidity`)가 **둘 다 Safe 예약 → 7일 대기**를 거칩니다.
 > 배포 지갑에 뒀다면 「7일 전에 보인다」가 거짓이 됐을 자리입니다. (D-014)
+
+### 배포 지갑은 비우고 폐기했습니다 (2026-08-27)
+
+`docs/HANDOVER.md` 가 「배포와 LP 설치가 끝나면 비우고 폐기한다」고 적어둔 대로 했습니다.
+**순차 전송 중 전량이 그 지갑에 있는 순간이 실재**하기 때문입니다.
+
+| | 남은 것 |
+|---|---|
+| YUMI | `0.0000000000124` — mint 반올림 잔여 |
+| ETH | `0.0000003` — 가스 계산 여유분 |
+| 포지션 NFT | **0개** |
+| 타임락 권한 | **없음** (예약·취소·관리자 전부 false) |
+
+**완전히 0으로 비우는 방법은 없습니다.** 이더리움 계열은 가스를 먼저 잡아두고 실행하므로
+보내는 금액과 가스의 합이 잔액을 넘으면 시작조차 하지 않습니다.
+Base 는 여기에 L1 데이터 수수료가 더 붙습니다. **그래서 먼지는 영원히 남습니다.**
+
+남은 ETH 는 [`0x60919283…62e4`](https://basescan.org/address/0x60919283FD3311D38aBd2D6e7111f30cbf8e62e4) 로 옮겼습니다.
+**이 주소는 이 프로젝트의 물량을 쥐고 있지 않습니다** — 가스를 회수한 개인 지갑입니다.
 
 **두 베스팅의 수령 주소는 지갑이 아니라 위 타임락입니다.** (D-015)
 
