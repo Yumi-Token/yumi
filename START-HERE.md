@@ -153,8 +153,11 @@ Suite result: ok. 23 passed; 0 failed  (Deployment)
 - https://www.alchemy.com/faucets/base-sepolia
 - 또는 https://docs.base.org/chain/network-faucets 에 있는 목록
 
-배포에 필요한 양은 **0.01 ETH도 안 됩니다.** (로컬 실측 가스 3,182,788 — 컨트랙트가
-2개에서 4개로 늘면서 이전 1,256,692에서 증가했습니다)
+배포에 필요한 양은 **0.01 ETH도 안 됩니다.**
+
+실제 테스트넷 배포는 트랜잭션 7건 합계 **3,545,148 gas**였습니다
+(`broadcast/Deploy.s.sol/84532/run-latest.json` 에 그대로 있습니다).
+로컬 추정은 3,182,788이었고 실제와 약간 달랐습니다 — **추정과 실측은 다릅니다.**
 
 ### (3) Basescan API 키
 
