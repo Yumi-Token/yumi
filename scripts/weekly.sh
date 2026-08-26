@@ -279,11 +279,15 @@ do_anchor() {
     # 앵커는 Base 메인넷에만 남깁니다. 테스트넷 앵커는 판정에 들어가지 않고,
     # 테스트넷이 종료되면 근거가 함께 사라집니다 (docs/RECORD.md).
     # 막지는 않습니다 — 리허설은 정당한 용도입니다. 다만 조용히 지나가지 않게 합니다.
-    case "$RPC_URL" in
+    local a_rpc a_exp
+    a_rpc="${ANCHOR_RPC_URL:-$RPC_URL}"
+    a_exp="${ANCHOR_EXPLORER:-$EXPLORER}"
+
+    case "$a_rpc" in
         *sepolia*|*goerli*|*127.0.0.1*|*localhost*)
-            printf '\n🔴 지금 RPC 는 테스트넷입니다 — %s\n' "$RPC_URL" >&2
+            printf '\n🔴 앵커를 테스트넷으로 보내려 하고 있습니다 — %s\n' "$a_rpc" >&2
             printf '   이대로 보내면 판정에 들어가지 않습니다. 리허설이면 그대로 진행하세요.\n' >&2
-            printf '   본 발행이면 scripts/weekly.conf 의 NETWORK·RPC_URL·EXPLORER 를 먼저 바꾸세요.\n' >&2
+            printf '   본 발행이면 scripts/weekly.conf 의 ANCHOR_RPC_URL 을 먼저 바꾸세요.\n' >&2
             ;;
     esac
 
@@ -304,7 +308,7 @@ sha256  $hash
   cast send $ANCHOR_WALLET $data \\
     --value 0 \\
     --account weekly-anchor \\
-    --rpc-url $RPC_URL
+    --rpc-url $a_rpc
 
 ⚠️ 지금부터 이 파일을 한 글자도 고치지 마세요. 해시가 달라집니다.
 ⚠️ --account 로 키스토어를 씁니다. --private-key 를 명령에 넣으면 키가 셸 히스토리에 남습니다.
@@ -315,7 +319,7 @@ sha256  $hash
 (기록 파일이 아니라 ANCHORS.md 입니다 — 파일 안에 자기 tx 를 넣으면 해시가
  자기 자신을 가리키게 됩니다. D-026)
 
-  | $(basename "$file" .md) | $hash | [<txhash>]($EXPLORER/tx/<txhash>) |
+  | $(basename "$file" .md) | $hash | [<txhash>]($a_exp/tx/<txhash>) |
 ────────────────────────────────────────────
 
 EOF
