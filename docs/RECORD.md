@@ -35,7 +35,7 @@ Windows PowerShell을 쓴다면 `Get-FileHash`를 쓰세요 — 아래 두 명�
 
 ```powershell
 # 2) 해시 — PowerShell
-(Get-FileHash log/2026-W34.md -Algorithm SHA256).Hash.ToLower()
+(Get-FileHash log/2026-W35.md -Algorithm SHA256).Hash.ToLower()
 # 64c757...(64자)
 ```
 
@@ -44,12 +44,12 @@ Windows PowerShell을 쓴다면 `Get-FileHash`를 쓰세요 — 아래 두 명�
 
 ```bash
 # 2) 해시 — Git Bash / WSL
-sha256sum log/2026-W34.md
+sha256sum log/2026-W35.md
 # 64c757...(64자)
 
 # 3) 앵커 — 주간 해시 지갑에서 자기 자신에게 0원 전송, calldata에 해시
 cast send <해시지갑 주소> \
-  $(cast from-utf8 "LOG 2026-W34.md sha256:a3f2...") \
+  $(cast from-utf8 "LOG 2026-W35.md sha256:a3f2...") \
   --value 0 --account weekly --rpc-url base
 ```
 
@@ -82,7 +82,7 @@ UTF-8로 넣기 때문에 **Basescan의 Input Data를 UTF-8로 보면 사람이 
 **PowerShell에서는 `$(...)` 치환이 bash와 다릅니다.** 두 줄로 나누세요.
 
 ```powershell
-$data = cast from-utf8 "LOG 2026-W34.md sha256:64c757..."
+$data = cast from-utf8 "LOG 2026-W35.md sha256:64c757..."
 cast send <해시지갑 주소> $data --value 0 --account weekly --rpc-url base
 ```
 
@@ -95,7 +95,7 @@ cast send <해시지갑 주소> $data --value 0 --account weekly --rpc-url base
 
 ```bash
 # 파일을 받아서 (PowerShell 은 Get-FileHash)
-sha256sum 2026-W34.md
+sha256sum 2026-W35.md
 
 # 트랜잭션의 입력값을 읽어서 (0x 를 떼고 넘겨야 합니다)
 cast to-utf8 $(cast tx <TXHASH> input --rpc-url base | sed 's/^0x//')

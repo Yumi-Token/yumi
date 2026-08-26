@@ -79,7 +79,7 @@ AI에게 준 작업 지시문은 저장소에 올리지 않습니다 (`Claude/` 
 ## 파일 이름
 
 ```
-log/2026-W34.md
+log/2026-W35.md
 ```
 
 ISO 주차를 씁니다. 순서가 자동으로 맞고 빠진 주가 눈에 보입니다.
@@ -106,7 +106,7 @@ ISO 주차를 씁니다. 순서가 자동으로 맞고 빠진 주가 눈에 보�
 # 예시 — 글 파일의 해시를 자기 자신에게 보내며 데이터로 첨부
 cast send $MY_ADDRESS \
   --value 0 \
-  --data $(cast keccak "$(cat log/2026-W34.md)") \
+  --data $(cast keccak "$(cat log/2026-W35.md)") \
   --rpc-url base \
   --private-key $PRIVATE_KEY
 ```

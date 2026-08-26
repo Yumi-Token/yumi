@@ -276,6 +276,17 @@ do_anchor() {
         printf '\n⚠️ %s 에 「(확인 필요)」가 남아 있습니다. 그대로 올리셔도 되지만 한 번 보세요.\n' "$file" >&2
     fi
 
+    # 앵커는 Base 메인넷에만 남깁니다. 테스트넷 앵커는 판정에 들어가지 않고,
+    # 테스트넷이 종료되면 근거가 함께 사라집니다 (docs/RECORD.md).
+    # 막지는 않습니다 — 리허설은 정당한 용도입니다. 다만 조용히 지나가지 않게 합니다.
+    case "$RPC_URL" in
+        *sepolia*|*goerli*|*127.0.0.1*|*localhost*)
+            printf '\n🔴 지금 RPC 는 테스트넷입니다 — %s\n' "$RPC_URL" >&2
+            printf '   이대로 보내면 판정에 들어가지 않습니다. 리허설이면 그대로 진행하세요.\n' >&2
+            printf '   본 발행이면 scripts/weekly.conf 의 NETWORK·RPC_URL·EXPLORER 를 먼저 바꾸세요.\n' >&2
+            ;;
+    esac
+
     local hash data
     # 파일명이 아니라 내용을 파이프로 넘깁니다.
     # 경로에 역슬래시가 있으면 sha256sum 이 줄 앞에 \ 를 붙여 이스케이프하고,
