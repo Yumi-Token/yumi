@@ -66,8 +66,12 @@
       파일을 못 고칩니다(해시가 깨집니다). 메모째로 해시가 박힙니다
 - [ ] `README.md`의 영문 요약이 한국어 본문과 어긋나지 않는가
 - [ ] **`PROMISE.md`가 한 화면을 넘지 않는가** — 3,000자 이하 (D-032)
-      ⚠️ Git Bash 의 `wc -m` 은 C 로케일에서 **바이트**를 셉니다. 한글이 3바이트라
-      2,555자가 5,265로 나옵니다. PowerShell `(Get-Content PROMISE.md -Raw).Length` 를 쓰세요
+      ⚠️ **같은 파일이 셋 다르게 나옵니다.** 반드시 아래 명령을 그대로 쓰세요.
+      ```powershell
+      (Get-Content PROMISE.md -Raw -Encoding UTF8).Length     # 2,555  ← 이 값
+      ```
+      `-Encoding UTF8` 을 빼면 **3,142**, Git Bash `wc -m` 은 **5,265**(바이트)로 나옵니다.
+      둘 다 3,000을 넘어서 **멀쩡한 문서를 초과로 오판하게 됩니다.** 실제로 한 번 그랬습니다
 - [ ] `PROMISE.md`에서 뺀 내용이 **전부 2층 어딘가에 실제로 있는가** — 하나라도 없으면 분실
 - [ ] `scripts/weekly.conf`의 주소가 `docs/WALLETS.md`와 일치하는가
       — 메인넷 배포 후 `NETWORK`·`RPC_URL`·`EXPLORER`를 바꿨는지 특히 확인
