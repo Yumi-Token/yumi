@@ -301,14 +301,15 @@ sha256  $hash
 
 아래를 붙여넣어 직접 실행하세요. 이 스크립트는 실행하지 않습니다.
 
-  cast send $ANCHOR_WALLET \\
+  cast send $ANCHOR_WALLET $data \\
     --value 0 \\
-    --data $data \\
-    --rpc-url $RPC_URL \\
-    --interactive
+    --account weekly-anchor \\
+    --rpc-url $RPC_URL
 
 ⚠️ 지금부터 이 파일을 한 글자도 고치지 마세요. 해시가 달라집니다.
-⚠️ --interactive 를 씁니다. --private-key 를 명령에 넣으면 키가 셸 히스토리에 남습니다.
+⚠️ --account 로 키스토어를 씁니다. --private-key 를 명령에 넣으면 키가 셸 히스토리에 남습니다.
+⚠️ 보내기 전에 확인 — cast wallet address --account weekly-anchor
+   그 주소가 위 $ANCHOR_WALLET 과 달라지면 그 주는 판정에 안 들어갑니다. (D-034)
 
 트랜잭션이 확정되면 log/ANCHORS.md 에 아래 줄을 추가하세요.
 (기록 파일이 아니라 ANCHORS.md 입니다 — 파일 안에 자기 tx 를 넣으면 해시가

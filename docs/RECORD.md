@@ -1,5 +1,14 @@
 # 기록 앵커링 — 매주 하는 일
 
+> **키스토어 이름은 `weekly-anchor` 입니다.** 그 키스토어가 가리키는 주소가
+> `docs/WALLETS.md` 의 해시 지갑과 같아야 합니다. 다른 주소에서 보내면
+> **D-034 판정 대상이 아니어서 그 주가 통째로 안 세어집니다.**
+>
+> 보내기 전에 확인 — `cast wallet address --account weekly-anchor`
+>
+> 실제로 다른 키스토어로 시도했다가 `gas required exceeds allowance (0)` 로 막힌 적이 있습니다.
+> 그 계정에 잔액이 없어서 나는 오류이고, **주소가 틀렸다는 신호입니다.**
+
 종료 조건(D-009)의 판정 기준은 **해시 지갑이 보낸(from) 마지막 기록 해시 트랜잭션의 블록 타임스탬프**입니다. calldata 가 `LOG ` 로 시작하는 것만 셉니다 — 그 주소로 **들어온** 트랜잭션과 `LOG ` 로 시작하지 않는 트랜잭션은 판정에 넣지 않습니다. (D-034)
 이 문서는 그 트랜잭션을 만드는 절차입니다.
 
@@ -50,7 +59,7 @@ sha256sum log/2026-W35.md
 # 3) 앵커 — 주간 해시 지갑에서 자기 자신에게 0원 전송, calldata에 해시
 cast send <해시지갑 주소> \
   $(cast from-utf8 "LOG 2026-W35.md sha256:a3f2...") \
-  --value 0 --account weekly --rpc-url base
+  --value 0 --account weekly-anchor --rpc-url base
 ```
 
 **형식** — `LOG <파일명> sha256:<64자 16진수>`
@@ -87,7 +96,7 @@ UTF-8로 넣기 때문에 **Basescan의 Input Data를 UTF-8로 보면 사람이 
 
 ```powershell
 $data = cast from-utf8 "LOG 2026-W35.md sha256:64c757..."
-cast send <해시지갑 주소> $data --value 0 --account weekly --rpc-url base
+cast send <해시지갑 주소> $data --value 0 --account weekly-anchor --rpc-url base
 ```
 
 **실측 (2026-08-23 테스트넷 리허설)** — 가스 24,480, 소요 시간 3분.
