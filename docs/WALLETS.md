@@ -30,7 +30,7 @@
 | 창업자 베스팅 | 20,000,000 | 3개월 클리프 + 12개월 | [`0x22FB76084160482488a3C8d752a963e4F36594A9`](https://sepolia.basescan.org/address/0x22FB76084160482488a3C8d752a963e4F36594A9) |
 | 장기 재고 베스팅 | 65,000,000 | 배포 +1년부터 3년 | [`0xbDD3f6586093d5ec287d902A2F01A681c8131189`](https://sepolia.basescan.org/address/0xbDD3f6586093d5ec287d902A2F01A681c8131189) |
 | 트레저리 = 근거리 재고 (배포 지갑) | 5,000,000 | 없음 | [`0x521ECcA9039c2502C4a5d1572D705F53723614d6`](https://sepolia.basescan.org/address/0x521ECcA9039c2502C4a5d1572D705F53723614d6) |
-| **Safe 2-of-3** (타임락 예약 권한) | — | — | [`0xeEE81a7865915a67f57651118426793d0BE986aA`](https://sepolia.basescan.org/address/0xeEE81a7865915a67f57651118426793d0BE986aA) |
+| **Safe 2-of-3** (타임락 예약 권한) | **1,000,000** | 없음 | [`0xeEE81a7865915a67f57651118426793d0BE986aA`](https://sepolia.basescan.org/address/0xeEE81a7865915a67f57651118426793d0BE986aA) |
 | 주간 기록 해시 지갑 | — | — | [`0x1d97440D9B28D387ECB2ee32cfba6299dDA27453`](https://sepolia.basescan.org/address/0x1d97440D9B28D387ECB2ee32cfba6299dDA27453) |
 
 **두 베스팅의 수령 주소는 지갑이 아니라 위 타임락입니다.** (D-015)
@@ -71,7 +71,7 @@
 | ~~트레저리 = 배포 지갑~~ | **0** | — | [`0x521ECcA9039c2502C4a5d1572D705F53723614d6`](https://basescan.org/address/0x521ECcA9039c2502C4a5d1572D705F53723614d6) — **비웠습니다** |
 | **Safe 2-of-3** (타임락 예약 권한) | — | — | [`0x7acFA2c49965b5E37a311Ff927FfCCef52a1Fe93`](https://basescan.org/address/0x7acFA2c49965b5E37a311Ff927FfCCef52a1Fe93) |
 | 주간 기록 해시 지갑 | — | — | [`0x1d97440D9B28D387ECB2ee32cfba6299dDA27453`](https://basescan.org/address/0x1d97440D9B28D387ECB2ee32cfba6299dDA27453) |
-| LP 포지션 NFT ×5 | 4,000,000 상당 | **타임락 보관** | [`#5883905`](https://basescan.org/nft/0x03a520b32C04BF3bEEf7BEb72E919cf822Ed34f1/5883905) [`#5883912`](https://basescan.org/nft/0x03a520b32C04BF3bEEf7BEb72E919cf822Ed34f1/5883912) [`#5883918`](https://basescan.org/nft/0x03a520b32C04BF3bEEf7BEb72E919cf822Ed34f1/5883918) [`#5883919`](https://basescan.org/nft/0x03a520b32C04BF3bEEf7BEb72E919cf822Ed34f1/5883919) [`#5883974`](https://basescan.org/nft/0x03a520b32C04BF3bEEf7BEb72E919cf822Ed34f1/5883974) |
+| LP 포지션 NFT ×5 | 최초 4,000,000 | **타임락 보관** | [`#5883905`](https://basescan.org/nft/0x03a520b32C04BF3bEEf7BEb72E919cf822Ed34f1/5883905) [`#5883912`](https://basescan.org/nft/0x03a520b32C04BF3bEEf7BEb72E919cf822Ed34f1/5883912) [`#5883918`](https://basescan.org/nft/0x03a520b32C04BF3bEEf7BEb72E919cf822Ed34f1/5883918) [`#5883919`](https://basescan.org/nft/0x03a520b32C04BF3bEEf7BEb72E919cf822Ed34f1/5883919) [`#5883974`](https://basescan.org/nft/0x03a520b32C04BF3bEEf7BEb72E919cf822Ed34f1/5883974) |
 | **풀 (Uniswap v3, 1%)** | — | — | [`0xaC130b30C9Bf0a337FDB8259344C2d7b571B4E3d`](https://basescan.org/address/0xaC130b30C9Bf0a337FDB8259344C2d7b571B4E3d) |
 
 > **2026-08-27 완료.** 배포 지갑 잔고는 **0**이고(반올림 잔여 0.0000000000124 제외),
@@ -79,6 +79,30 @@
 > **Safe는 타임락이 아니므로 이 1M은 7일 예고 대상이 아닙니다.**
 > 「예고 없이 움직일 수 있는 양 1%」가 이것입니다.
 >
+### 잔고를 직접 보는 법
+
+**어느 주소든 아래 두 가지로 확인하실 수 있습니다.** 우리 말을 믿지 않으셔도 됩니다.
+
+```
+지갑 하나의 YUMI 잔고
+https://basescan.org/token/0xbDD3f6586093d5ec287d902A2F01A681c8131189?a=<주소>
+
+전체 홀더 순위
+https://basescan.org/token/0xbDD3f6586093d5ec287d902A2F01A681c8131189#balances
+```
+
+**Safe 안을 보시려면** — 서명자 구성과 예약 대기 중인 거래까지 보입니다.
+
+```
+https://app.safe.global/home?safe=base:0x7acFA2c49965b5E37a311Ff927FfCCef52a1Fe93
+```
+
+**LP 물량은 지갑이 아니라 풀에 있습니다.** 포지션 NFT 5개는 타임락이 들고 있고,
+토큰 자체는 풀 컨트랙트 주소에 잡힙니다. **거래가 일어나면 이 숫자는 줄어듭니다** —
+판 것이 아니라 **누군가 산 것**입니다.
+
+---
+
 > 🔴 **포지션 NFT 5개는 전부 타임락에 있습니다.** 그래서 수수료 수령(`collect`)과
 > 판매 대금 회수(`decreaseLiquidity`)가 **둘 다 Safe 예약 → 7일 대기**를 거칩니다.
 > 배포 지갑에 뒀다면 「7일 전에 보인다」가 거짓이 됐을 자리입니다. (D-014)
