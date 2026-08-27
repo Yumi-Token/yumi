@@ -34,30 +34,92 @@ Uniswap 기본 목록에 들어가는 것은 별개이고, 그건 우리가 정�
 
 ---
 
-## ② Basescan — 소스 검증이 먼저입니다
+## ② Basescan — 지금 열려 있는 유일한 심사 경로
 
-토큰 페이지의 로고·설명·링크는 Basescan 에 **따로 신청**합니다.
-**컨트랙트 소스가 검증돼 있어야** 신청 자체가 됩니다.
+컨트랙트 **소스 검증이 2026-08-27 에 넷 다 끝났습니다** (`Exact Match`).
+배포 때 `Not all (0 / 4) contracts were verified!` 가 떴지만 **큐가 느렸을 뿐**이었습니다.
+
+| 컨트랙트 | 상태 |
+|---|---|
+| [Token](https://basescan.org/address/0xbDD3f6586093d5ec287d902A2F01A681c8131189#code) | ✅ Exact Match |
+| [Timelock](https://basescan.org/address/0x22FB76084160482488a3C8d752a963e4F36594A9#code) | ✅ Exact Match |
+| [창업자 베스팅](https://basescan.org/address/0x2bdC70Acbf26162B2bFd300eB2826542EFf4e0bE#code) | ✅ Exact Match |
+| [장기 재고 베스팅](https://basescan.org/address/0xe4981c703bA99fC7f8F2db5C8c3096a877c8E13c#code) | ✅ Exact Match |
+
+토큰 페이지의 로고·설명·링크는 **따로 신청**합니다. 순서는 이렇습니다.
 
 ```
-검증 상태  basescan.org/address/0xbDD3f6586093d5ec287d902A2F01A681c8131189#code
+① basescan.org 계정 만들기
+② 주소 소유권 증명 — 배포 지갑으로 메시지 서명
+③ Token Update 폼 제출
 ```
+
+**②가 배포 지갑 키를 남겨둔 이유입니다.** 서명은 트랜잭션이 아니라 가스도 들지 않습니다.
+
+### 소유권 서명 명령
+
+Basescan 이 주는 문자열을 그대로 넣으시면 됩니다. **가스 0, 트랜잭션 아님.**
+
+```
+cast wallet sign --account deploy "<Basescan 이 준 메시지>"
+```
+
+🔴 **`--private-key` 를 쓰지 마세요.** 셸 기록에 키가 남습니다. `--account` 만 씁니다.
+
+### 폼에 넣을 내용
+
+**약속으로 읽힐 문장을 넣지 않습니다.** 아래는 그 기준으로 미리 쓴 것입니다.
+
+```
+Token Contract    0xbDD3f6586093d5ec287d902A2F01A681c8131189
+Project Name      Yumi
+Website           https://github.com/Yumi-Token/yumi
+Logo              assets/yumi-logo-256.png   (256×256 · 84KB)
+Token List        https://raw.githubusercontent.com/Yumi-Token/yumi/main/tokenlist.json
+```
+
+Description (영문 — Basescan 은 영어로 받습니다):
+
+```
+Yumi is a one-person, AI-assisted project on Base that publishes its
+build log in public. Its only stated commitment is to keep publishing
+verifiable weekly records; if eight consecutive weeks pass without one,
+the project declares itself ended.
+
+The token contract is a standard OpenZeppelin ERC20 with no custom code:
+no owner, no mint function, no transfer fee, no blacklist, no pause.
+Treasury holdings sit behind a 7-day timelock and vesting contracts.
+
+All records, decisions, addresses, and mistakes are public. Records are
+free to read and require no token.
+```
+
+🔴 **「곧」·「예정」·수익 관련 문구가 한 줄도 없는지 넣기 전에 다시 읽으세요.**
+등록 정보는 **우리 문서보다 넓게 퍼지고, 고치는 데 다시 심사가 걸립니다.**
 
 ---
 
-## ③ 외부 심사가 붙는 곳
+## ③ 아직 못 하는 곳 — 조건을 실측했습니다
 
-**아래는 전부 남이 판단합니다.** 신청은 우리가 하지만 **통과 여부와 시점을 우리가 정하지 못합니다.**
-그래서 이 문서에도, 채널에도 **「언제 올라간다」고 쓰지 않습니다.**
+**「무료니까 일단 넣어보자」가 안 됩니다.** 조건을 재봤더니 **둘 다 한참 미달**입니다.
 
-| 어디 | 방식 | 비용 | 걸리는 조건 |
-|---|---|---|---|
-| **Trust Wallet Assets** | GitHub PR | 무료 | 유동성·기간 등 자체 기준이 있습니다 |
-| **CoinGecko** | 신청 폼 | 무료 | 수동 심사 |
-| **DEX Screener** | 자체 신청 | **유료** | 로고·링크 등록이 유료 상품입니다 |
+| 어디 | 요구 | 2026-08-27 현재 |
+|---|---|---|
+| **Trust Wallet** | 홀더 10,000명 | **6명** |
+| **Trust Wallet** | 트랜잭션 15,000건 | **0건** |
+| **Trust Wallet** | 「brand new tokens are not accepted」 | 배포 **1일차** |
+| **CoinGecko** | 활발히 거래 중일 것 | **거래 0건** |
+| **DEX Screener** | 로고 등록이 **유료 상품** | 풀 색인도 아직 |
 
-**DEX Screener 는 아직 우리 풀을 잡지 못했습니다** — 첫 거래가 있어야 색인되는 경우가 많습니다.
-**GeckoTerminal 은 이미 잡았습니다.**
+**셋 다 같은 곳에서 막힙니다 — 아직 아무도 사지 않았습니다.**
+풀은 정상이고 견적도 정상이지만 **체결이 0건**이라 집계 사이트가 가격을 계산하지 못합니다.
+GeckoTerminal 이 `YUMI / USDC 1%` 를 잡고도 가격이 비어 있는 이유입니다.
+
+🔴 **그래서 지금 넣지 않았습니다.** 반려될 신청을 넣는 것은 **홍보가 아니라 소음**이고,
+「우리가 신청했다」는 말이 「곧 올라간다」로 읽히면 그건 약속이 됩니다. (D-036)
+
+**이 표의 숫자는 직접 확인하실 수 있습니다** — 홀더 수는 토큰 페이지에,
+체결 건수는 풀 주소의 `Swap` 이벤트에 있습니다.
 
 ### 🔴 배포 지갑 키를 버리지 마세요
 
